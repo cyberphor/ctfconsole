@@ -39,3 +39,6 @@ Write-Host "Hello world!"
 
 ## References
 * None (yet)
+
+## Copyright
+This project is licensed under the terms of the [MIT license](/_misc/LICENSE).
