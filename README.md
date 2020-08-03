@@ -39,3 +39,6 @@ You will learn the following concepts that are fundamental to every computer pro
 
 ## References
 * [Hackernoon - "Introducing the InfoSec colour wheel — blending developers with red and blue security teams."](https://hackernoon.com/introducing-the-infosec-colour-wheel-blending-developers-with-red-and-blue-security-teams-6437c1a07700)
+
+## Copyright
+This project is licensed under the terms of the [MIT license](/_misc/LICENSE).
