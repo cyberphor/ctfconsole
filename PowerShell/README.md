@@ -13,7 +13,7 @@
     * [References](#references)
 * [Python](/Python/README.md)
 
-# Python
+# PowerShell
 
 ## Level 1: Output
 ```pwsh
