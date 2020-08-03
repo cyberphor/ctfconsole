@@ -13,7 +13,6 @@
 * [Getting Setup](/_misc/getting_setup.md)
 * [PowerShell](/PowerShell/README.md)
 * [Python](/Python/README.md)
-* [References](#references)
 
 ## What is this?
 This a repository of Yellow Team "Capture The Flag" (CTF) challenges I created. 
