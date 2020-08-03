@@ -23,16 +23,17 @@ This a repository of Yellow Team "Capture The Flag" (CTF) challenges I created.
 * Short answer: anyone who wants to learn how to code. 
 
 ## How do I use it?
-1. Pick a language:
+1. First, read and follow the instructions in "[Getting Setup](/_misc/getting_setup.md)."
+2. Then, pick a language:
     * [PowerShell](PowerShell/README.md)
     * [Python](/Python/README.md)
-2. Change directories to it using: `cd ./Python/`
-3. Follow the instructions to progress through each level. 
+3. Next, change directories to it using: `cd ./Python/`
+4. Finally, follow the instructions to progress through each level. 
 
 ## What will I learn?
 You will learn the following concepts that are fundamental to every computer programming language:
-* Input
 * Output
+* Input
 * Arithmetic 
 * Conditionals
 * Loops
