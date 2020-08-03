@@ -9,6 +9,8 @@
     * [How I do set it up?](#how-do-i-set-it-up)
     * [How do I use it?](#how-do-i-use-it)
     * [What will I learn?](#what-will-i-learn)
+    * [References](#references)
+* [Getting Setup](/_misc/getting_setup.md)
 * [PowerShell](/PowerShell/README.md)
 * [Python](/Python/README.md)
 * [References](#references)
