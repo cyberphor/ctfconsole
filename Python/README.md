@@ -3,6 +3,7 @@
 
 ## Table of Contents
 * [Home](/README.md)
+* [Getting Setup](/_misc/getting_setup.md)
 * [PowerShell](/PowerShell/README.md)
 * [Python](/Python/README.md)
     * [Level 1: Output](#level-1-output)
@@ -10,7 +11,7 @@
     * [Level 3: Arithmetic](#level-3-arithmetic)
     * [Level 4: Conditionals](#level-4-conditionals)
     * [Level 5: Loops](#level-5-loops)
-* [References](#references)
+    * [References](#references)
 
 ## Level 1: Output
 ```python
