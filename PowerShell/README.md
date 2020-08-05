@@ -22,22 +22,30 @@ Write-Host "Hello world!"
 
 ## Level 2: Input
 ```pwsh
-# insert code here
+$name = Read-Host -Prompt "What is your name?"
+Write-Host $name
 ```
 
 ## Level 3: Arithmetic
 ```pwsh
-# insert code here
+1+1
 ```
 
 ## Level 4: Conditionals
 ```pwsh
-# insert code here
+$name = Read-Host -Prompt "What is your name?"
+if ($name -eq 'victor') {
+    Write-Host "Long time, no see $name"
+} else {
+    Write-Host "Hello $name"
+}
 ```
 
 ## Level 5: Loops
 ```pwsh
-# insert code here
+1..3 | ForEach-Object {
+    Write-Host "Counting down $_"
+}
 ```
 
 ## References
