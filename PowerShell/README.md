@@ -14,25 +14,61 @@
 * [Python](/Python/README.md)
 
 # PowerShell
+## Level 0
+```bash
+sudo apt install powershell
+```
 
 ## Level 1: Output
+```bash
+vim level_1.ps1
+```
 ```pwsh
+#!/usr/bin/env pwsh
+
 Write-Host "Hello world!"
+```
+```bash
+chmod +x level_1.ps1
+./level_1.ps1
 ```
 
 ## Level 2: Input
+```bash
+vim level_2.ps1
+```
 ```pwsh
+#!/usr/bin/env pwsh
+
 $name = Read-Host -Prompt "What is your name?"
 Write-Host $name
 ```
+```bash
+chmod +x level_2.ps1
+./level_2.ps1
+```
 
 ## Level 3: Arithmetic
+```bash
+vim level_3.ps1
+```
 ```pwsh
+#!/usr/bin/env pwsh
+
 1+1
+```
+```bash
+chmod +x level_3.ps1
+./level_3.ps1
 ```
 
 ## Level 4: Conditionals
+```bash
+vim level_4.ps1
+```
 ```pwsh
+#!/usr/bin/env pwsh
+
 $name = Read-Host -Prompt "What is your name?"
 if ($name -eq 'victor') {
     Write-Host "Long time, no see $name"
@@ -40,12 +76,25 @@ if ($name -eq 'victor') {
     Write-Host "Hello $name"
 }
 ```
+```bash
+chmod +x level_4.ps1
+./level_4.ps1
+```
 
 ## Level 5: Loops
+```bash
+vim level_5.ps1
+```
 ```pwsh
+#!/usr/bin/env pwsh
+
 1..3 | ForEach-Object {
     Write-Host "Counting down $_"
 }
+```
+```bash
+chmod +x level_5.ps1
+./level_5.ps1
 ```
 
 ## References
