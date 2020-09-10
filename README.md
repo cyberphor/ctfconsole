@@ -10,15 +10,35 @@
 ## Installation
 ```bash
 git clone https://github.com/cyberphor/yellowteam-ctf-challenges.git
-chmod +x ./YellowTeam-CTF-Challenges/Python/yellowteam-ctf.py
+chmod +x ./YellowTeam-CTF-Challenges/ctf.py
 cp ./YellowTeam-CTF-Challenges/ /usr/local/games/
 ```
 
 ## Usage
-```bash
-yellowteam-ctf.py
-# OR
-yellowteam-ctf.py --username victor --password please
+### Starting the CTF
+```
+ctf.py
+```
+### Solving a Challenge
+```
+-----------------------------------
+[+] Welcome to the YellowTeam CTF!
+-----------------------------------
+>>> ctf.get_challenge(1)
+'What is the sum of ctf.data(1) + 1?'
+>>> ctf.data(1)
+22
+>>> ctf.solve(1,ctf.data(1)+1)
+'[+] Correct!'
+```
+### Adding a Challenge 
+```
+>>> ctf.admin.add_challenge(42)
+[>] Challenge: Carve-out and hash the JPEG found in ctf.data(42).
+[>] Solution: 5eb63bbbe01eeed093cb22bb8f5acdc3
+[>] Points: 5
+[>] Are you sure? (y/n) y
+'[+] Added challenge #42 to the game.'
 ```
 
 ## What is a Yellow Team?
