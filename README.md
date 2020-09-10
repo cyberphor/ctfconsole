@@ -1,4 +1,4 @@
-# Yellow Team CTF Challenges
+# Yellow Team CTF
 ![yellow.gif](/_misc/yellow.gif)
 
 ## Table of Contents
@@ -9,9 +9,9 @@
 
 ## Installation
 ```bash
-git clone https://github.com/cyberphor/yellowteam-ctf-challenges.git
-chmod +x ./YellowTeam-CTF-Challenges/ctf.py
-cp ./YellowTeam-CTF-Challenges/ /usr/local/games/
+git clone https://github.com/cyberphor/yellowteam-ctf.git
+chmod +x ./YellowTeam-CTF/ctf.py
+cp ./YellowTeam-CTF/ /usr/local/games/
 ```
 
 ## Usage
