@@ -1,4 +1,4 @@
-# Yellow Team CTF
+# YellowTeam CTF
 ![yellow.gif](/_misc/yellow.gif)
 
 ## Table of Contents
