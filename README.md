@@ -10,8 +10,6 @@
 ## Installation
 ```bash
 git clone https://github.com/cyberphor/yellowteam-ctf.git
-chmod +x ./YellowTeam-CTF/ctf.py
-cp ./YellowTeam-CTF/ /usr/local/games/
 ```
 
 ## Usage
