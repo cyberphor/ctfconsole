@@ -7,11 +7,18 @@ import os
 import sqlite3
 
 class game():
-    def __init__(self):
-        self.database = 'scoreboard.db'
-        self.connection = sqlite3.connect(self.database)
+    def __init__(self,args):
+        if os.path.exists(args.scoreboard) == True:
+            self.scoreboard = args.scoreboard
+            self.connection = sqlite3.connect(self.scoreboard)
+            self.cursor = self.connection.cursor()
+        else:
+            print('[x] CTF scoreboard not found.')
+            exit()
+        self.scoreboard = 'scoreboard.db'
+        self.connection = sqlite3.connect(self.scoreboard)
         self.cursor = self.connection.cursor()
-        self.admin = self.administrator()
+        self.admin = self.administrator(args)
         self.get_challenge = self.admin.get_challenge
         if self.scoreboard_exists() == False:
             table = 'scoreboard', 'username', 'password', 'score'
@@ -93,13 +100,24 @@ class game():
             return '[x] Invalid credentials.'
 
     class administrator():
-        def __init__(self):
-            self.database = 'challenges.db'
-            self.connection = sqlite3.connect(self.database)
-            self.cursor = self.connection.cursor()
+        def __init__(self,args):
+            if os.path.exists(args.database) == True:
+                self.database = args.database
+                self.connection = sqlite3.connect(self.database)
+                self.cursor = self.connection.cursor()
+            else:
+                print('[x] CTF database not found.')
+                print(' -  Option 1: Download \'challenges.db\' from cyberphor\'s GitHub.')
+                print(' -  Option 2: Create your own CTF database via ./ctf.py --create-database')
+                print(' -  Option 3: Use your own CTF database via ./ctf.py --database')
+                exit()
             if self.table_exists('challenges') == False:
                 table = 'challenges', 'number', 'challenge', 'solution', 'points'
                 create_table = 'CREATE TABLE %s (%s INTEGER, %s TEXT, %s TEXT, %s INTEGER)' % (table)
+                self.api(create_table)
+            if self.table_exists('challenge_data') == False:
+                table = 'challenge_data', 'number', 'data'
+                create_table = 'CREATE TABLE %s (%s INTEGER, %s TEXT)' % (table)
                 self.api(create_table)
 
         def api(self,action):
@@ -127,7 +145,7 @@ class game():
             return records
 
         def get_challenge_data(self,number):
-            select = 'SELECT challenge, data FROM data '
+            select = 'SELECT number, data FROM challenge_data '
             where = 'WHERE number = "%s"' % (number)
             query = select + query
             records = self.api(query)
@@ -154,11 +172,17 @@ class game():
                 return '[x] Data for challenge #%s already exists.' % (number)
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--create-scoreboard')
+    parser.add_argument('--scoreboard',default='scoreboard.db')
+    parser.add_argument('--create-database')
+    parser.add_argument('--database',default='challenges.db')
+    args = parser.parse_args()
     dashes = '-----------------------------------'
     motd = '[+] Welcome to the YellowTeam CTF!'
     banner = '\n'.join([dashes,motd,dashes])
-    ctf = game()
-    code.interact(banner=banner, local=locals())
+    ctf = game(args)
+    code.interact(banner=banner,local=locals())
 
 if __name__ == '__main__':
     main()
