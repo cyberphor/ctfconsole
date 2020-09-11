@@ -27,7 +27,8 @@ class game():
        
     def api(self,action):
         records = self.cursor.execute(action).fetchall()
-        if 'CREATE' in action or 'INSERT' in action or 'UPDATE' in action or 'DELETE' in action: 
+        changes = ['CREATE','INSERT','UPDATE','DELETE']
+        if any(word in changes for word in action): 
             self.connection.commit()
         else:
             return records
@@ -122,7 +123,8 @@ class game():
 
         def api(self,action):
             records = self.cursor.execute(action).fetchall()
-            if 'CREATE' in action or 'INSERT' in action or 'UPDATE' in action or 'DELETE' in action: 
+            changes = ['CREATE','INSERT','UPDATE','DELETE']
+            if any(word in changes for word in action):
                 self.connection.commit()
             else:
                 return records
