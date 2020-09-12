@@ -8,9 +8,9 @@ import sqlite3
 
 class game():
     def __init__(self,args):
-        if args.scoreboard:
-            if os.path.exists(args.scoreboard):
-                self.scoreboard = args.scoreboard
+        if args.use_scoreboard:
+            if os.path.exists(args.use_scoreboard):
+                self.scoreboard = args.use_scoreboard
             else:
                 print('[x] CTF scoreboard not found.')
                 exit()
@@ -21,7 +21,7 @@ class game():
                 print('[x] CTF scoreboard already exists.')
                 exit()
         else: 
-            self.scoreboard = 'scoreboard.db'
+            self.scoreboard = 'scoreboard.sqlite'
         self.connection = sqlite3.connect(self.scoreboard)
         self.cursor = self.connection.cursor()
         self.admin = self.administrator(args)
@@ -29,13 +29,15 @@ class game():
         self.data = self.admin.get_challenge_data
         self.solve = self.admin.solve_challenge
         if self.scoreboard_exists() == False:
-            create = 'CREATE TABLE scoreboard (username TEXT, '
-            where = 'password TEXT, score INTEGER)'
-            create_table = create + where
-            self.api(create_table)
+            create_table = '''CREATE TABLE scoreboard
+                (username TEXT, password TEXT, score INTEGER)'''
+            self.api(create_table,None)
        
-    def api(self,action):
-        records = self.cursor.execute(action).fetchall()
+    def api(self,action,parameters):
+        if parameters == None:
+            records = self.cursor.execute(action).fetchall()
+        else:
+            records = self.cursor.execute(action,parameters).fetchall()
         keywords = ['CREATE','INSERT','UPDATE','DELETE']
         if any(trigger in action for trigger in keywords): 
             self.connection.commit()
@@ -43,46 +45,42 @@ class game():
             return records
 
     def scoreboard_exists(self):
-        select = 'SELECT count(name) FROM sqlite_master '
-        where = 'WHERE type = "table" and name = "scoreboard"'
-        query = select + where
-        records = self.api(query)[0][0]
+        query = '''SELECT count(name) FROM sqlite_master 
+            WHERE type = "table" and name = "scoreboard"'''
+        records = self.api(query,None)[0][0]
         if records > 0:
             return True
         else:
             return False
 
     def get_player(self,username):
-        select = 'SELECT username, score FROM scoreboard '
-        where = 'WHERE username = "%s"' % (username)
-        query = select + where
-        records = self.api(query)
+        query = '''SELECT username, score FROM scoreboard 
+            WHERE username = ?'''
+        username = (username,)
+        records = self.api(query,username)
         return records
 
     def add_player(self,username,password):
         if len(self.get_player(username)) == 0:
             password = hashlib.sha512(password.encode('UTF-8')).hexdigest()
-            score = 0
-            record = username, password, score
-            add = 'INSERT INTO scoreboard VALUES ('
-            where = '"%s", "%s", "%s")' % (record)
-            add_record = add + where
-            self.api(add_record)
+            add = '''INSERT INTO scoreboard VALUES (?, ?, ?)'''
+            record = (username, password, 0)
+            self.api(add,record)
             return '[+] Added %s to the scoreboard.' % (username)
         else: 
             return '[x] The username %s is already taken.' % (username)
 
     def get_scores(self):
-        query = 'SELECT username, score FROM scoreboard'
-        records = self.api(query)
+        query = '''SELECT username, score FROM scoreboard'''
+        records = self.api(query,None)
         return records
 
     def correct_password(self,username,password):
         password = hashlib.sha512(password.encode('UTF-8')).hexdigest()
-        select = 'SELECT password FROM scoreboard '
-        where = 'WHERE username = "%s"' % (username)
-        query = select + where
-        records = self.api(query)
+        query = '''SELECT password FROM scoreboard 
+            WHERE username = ?'''
+        username = (username,)
+        records = self.api(query,username)
         if records:
             if password == records[0][0]: 
                 return True
@@ -94,112 +92,117 @@ class game():
 
     def remove_player(self,username,password):
         if self.correct_password(username,password) == True:
-            delete = 'DELETE FROM scoreboard '
-            where = 'WHERE username = "%s"' % (username)
-            delete_record = delete + where
-            self.api(delete_record)
+            delete = '''DELETE FROM scoreboard
+                WHERE username = ?'''
+            username = (username,)
+            self.api(delete,username)
             return '[!] Removed %s from the scoreboard.' % (username)
         else:
             return '[x] Invalid credentials.'
 
     def update_score(self,username,password,new_points):
         if self.correct_password(username,password) == True:
+            update = '''UPDATE players SET score = ?
+                WHERE username = ?'''
             score = self.get_player(username)[0][1] + new_points
-            update = 'UPDATE players SET score = '
-            where = '"%s" WHERE username = "%s"' % (score,username)
-            update_record = update + where
-            self.api(update_record)
+            record = (username, score)
+            self.api(update,record)
             return '[+] Updated the scoreboard.'
         else:
             return '[x] Invalid credentials.'
 
     class administrator():
         def __init__(self,args):
-            if args.database and os.path.exists(args.database):
-                self.database = args.database
+            if args.use_database and os.path.exists(args.use_database):
+                self.database = args.use_database
             elif args.create_database:
                 if os.path.exists(args.create_database) == False:
                     self.database = args.create_database
                 else:
                     print('[x] CTF database already exists.')
                     exit()
-            elif os.path.exists('challenges.db'):
-                self.database = 'challenges.db'
+            elif os.path.exists('challenges.sqlite'):
+                self.database = 'challenges.sqlite'
             else:
                 print('[x] CTF database not found.')
                 exit()
             self.connection = sqlite3.connect(self.database)
             self.cursor = self.connection.cursor()
-            if self.table_exists('challenges') == False:
-                create = 'CREATE TABLE challenges (number INTEGER, '
-                table = 'challenge TEXT, data TEXT, solution TEXT, '
-                create_table = create + table + 'points INTEGER)'
-                self.api(create_table)
+            if self.challenges_exist() == False:
+                create_table = '''CREATE TABLE challenges 
+                    (number INTEGER, points INTEGER, challenge TEXT, 
+                    solution BLOB, data BLOB)'''
+                self.api(create_table,None)
 
-        def api(self,action):
-            records = self.cursor.execute(action).fetchall()
+        def api(self,action,parameters):
+            if parameters == None:
+                records = self.cursor.execute(action).fetchall()
+            else:
+                records = self.cursor.execute(action,parameters).fetchall()
             keywords = ['CREATE','INSERT','UPDATE','DELETE']
             if any(trigger in action for trigger in keywords): 
                 self.connection.commit()
             else:
                 return records
 
-        def table_exists(self,table):
-            select = 'SELECT count(name) FROM sqlite_master '
-            where = 'WHERE type = "table" and name = "%s"' % (table)
-            query = select + where
-            records = self.api(query)[0][0]
+        def challenges_exist(self):
+            query = '''SELECT count(name) FROM sqlite_master 
+                WHERE type = "table" and name = "challenges"'''
+            records = self.api(query,None)[0][0]
             if records > 0:
                 return True
             else:
                 return False
 
         def get_challenge(self,number):
-            select = 'SELECT challenge, points FROM challenges '
-            where = 'WHERE number = "%s"' % (number)
-            query = select + where
-            records = self.api(query)
-            return records
+            query = '''SELECT challenge FROM challenges 
+                WHERE number = ?'''
+            number = (number,)
+            records = self.api(query,number)
+            if len(records) > 0:
+                return records[0][0]
+            else: 
+                return records
 
         def get_challenge_data(self,number):
-            select = 'SELECT data FROM challenges '
-            where = 'WHERE number = "%s"' % (number)
-            query = select + where
-            records = self.api(query)
-            if records == []:
-                return records
-            else:
+            query = '''SELECT data FROM challenges 
+                WHERE number = ?'''
+            number = (number,)
+            records = self.api(query,number)
+            if len(records) > 0:
                 return records[0][0]
+            else:
+                return records
 
-        def add_challenge(self,number,authorization):
+        def add_challenge(self,number,points,challenge,solution,data):
             if len(self.get_challenge(number)) == 0:
-                challenge = input('[>] Challenge: ')
-                data = input('[>] Data: ')
-                solution = input('[>] Solution: ')
-                points = input('[>] Points: ')
-                record = number, challenge, data, solution, points
-                add = 'INSERT INTO challenges VALUES ('
-                where = '"%s", "%s", "%s", "%s", "%s")' % (record)
-                add_record = add + where
-                answer = input('[>] Are you sure? (y/n)')
-                if answer == 'y':
-                    self.api(add_record)
-                    return '[+] Added challenge #%s to the game.' % (number)
+                add = '''INSERT INTO challenges VALUES (?, ?, ?, ?, ?)'''
+                record = (number, points, challenge, solution, data)
+                self.api(add,record)
+                return '[+] Added challenge #%s to the game.' % (number)
             else: 
                 return '[x] Challenge #%s already exists.' % (number)
 
         def solve_challenge(self,number,answer):
-            if len(self.get_challenge(number)) == 0:
-                return '[+] Correct!'
+            if len(self.get_challenge(number)) > 0:
+                query = '''SELECT solution FROM challenges 
+                    WHERE number = ?'''
+                number = (number,)
+                solution = self.api(query,number)[0][0]
+                if solution == answer:
+                    return '[+] Correct!'
+                else:
+                    return '[x] Incorrect.'
             else:
                 return '[x] Challenge #%s does not exist.' % (number)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--create-scoreboard')
-    parser.add_argument('--scoreboard')
+    parser.add_argument('--use-scoreboard')
     parser.add_argument('--create-database')
-    parser.add_argument('--database')
+    parser.add_argument('--use-database')
+    parser.add_argument('--add-challenges')
     args = parser.parse_args()
     dashes = '-----------------------------------'
     motd = '[+] Welcome to the YellowTeam CTF!'
