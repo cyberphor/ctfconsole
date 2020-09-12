@@ -8,20 +8,31 @@ import sqlite3
 
 class game():
     def __init__(self,args):
-        if os.path.exists(args.scoreboard) == True:
-            self.scoreboard = args.scoreboard
-            self.connection = sqlite3.connect(self.scoreboard)
-            self.cursor = self.connection.cursor()
-            self.admin = self.administrator(args)
-            self.get_challenge = self.admin.get_challenge
-            if self.scoreboard_exists() == False:
-                create = 'CREATE TABLE scoreboard (username TEXT, '
-                where = 'password TEXT, score INTEGER)'
-                create_table = create + where
-                self.api(create_table)
-        else:
-            print('[x] CTF scoreboard not found.')
-            exit()
+        if args.scoreboard:
+            if os.path.exists(args.scoreboard):
+                self.scoreboard = args.scoreboard
+            else:
+                print('[x] CTF scoreboard not found.')
+                exit()
+        elif args.create_scoreboard:
+            if os.path.exists(args.create_scoreboard) == False:
+                self.scoreboard = args.create_scoreboard
+            else:
+                print('[x] CTF scoreboard already exists.')
+                exit()
+        else: 
+            self.scoreboard = 'scoreboard.db'
+        self.connection = sqlite3.connect(self.scoreboard)
+        self.cursor = self.connection.cursor()
+        self.admin = self.administrator(args)
+        self.challenge = self.admin.get_challenge
+        self.data = self.admin.get_challenge_data
+        self.solve = self.admin.solve_challenge
+        if self.scoreboard_exists() == False:
+            create = 'CREATE TABLE scoreboard (username TEXT, '
+            where = 'password TEXT, score INTEGER)'
+            create_table = create + where
+            self.api(create_table)
        
     def api(self,action):
         records = self.cursor.execute(action).fetchall()
@@ -72,7 +83,7 @@ class game():
         where = 'WHERE username = "%s"' % (username)
         query = select + where
         records = self.api(query)
-        if len(records) > 0:
+        if records:
             if password == records[0][0]: 
                 return True
             else:
@@ -104,23 +115,26 @@ class game():
 
     class administrator():
         def __init__(self,args):
-            if os.path.exists(args.database) == True:
+            if args.database and os.path.exists(args.database):
                 self.database = args.database
-                self.connection = sqlite3.connect(self.database)
-                self.cursor = self.connection.cursor()
-                if self.table_exists('challenges') == False:
-                    create = 'CREATE TABLE challenges (number INTEGER, '
-                    table = 'challenge TEXT, solution TEXT, points INTEGER)'
-                    create_table = create + table
-                    self.api(create_table)
-                if self.table_exists('challenge_data') == False:
-                    create = 'CREATE TABLE challenge_data (number INTEGER, '
-                    table = 'data TEXT)'
-                    create_table = create + table
-                    self.api(create_table)
+            elif args.create_database:
+                if os.path.exists(args.create_database) == False:
+                    self.database = args.create_database
+                else:
+                    print('[x] CTF database already exists.')
+                    exit()
+            elif os.path.exists('challenges.db'):
+                self.database = 'challenges.db'
             else:
                 print('[x] CTF database not found.')
                 exit()
+            self.connection = sqlite3.connect(self.database)
+            self.cursor = self.connection.cursor()
+            if self.table_exists('challenges') == False:
+                create = 'CREATE TABLE challenges (number INTEGER, '
+                table = 'challenge TEXT, data TEXT, solution TEXT, '
+                create_table = create + table + 'points INTEGER)'
+                self.api(create_table)
 
         def api(self,action):
             records = self.cursor.execute(action).fetchall()
@@ -148,20 +162,24 @@ class game():
             return records
 
         def get_challenge_data(self,number):
-            select = 'SELECT number, data FROM challenge_data '
+            select = 'SELECT data FROM challenges '
             where = 'WHERE number = "%s"' % (number)
             query = select + where
             records = self.api(query)
-            return records
+            if records == []:
+                return records
+            else:
+                return records[0][0]
 
         def add_challenge(self,number,authorization):
             if len(self.get_challenge(number)) == 0:
                 challenge = input('[>] Challenge: ')
+                data = input('[>] Data: ')
                 solution = input('[>] Solution: ')
                 points = input('[>] Points: ')
-                record = number, challenge, solution, points
+                record = number, challenge, data, solution, points
                 add = 'INSERT INTO challenges VALUES ('
-                where = '"%s", "%s", "%s", "%s")' % (record)
+                where = '"%s", "%s", "%s", "%s", "%s")' % (record)
                 add_record = add + where
                 answer = input('[>] Are you sure? (y/n)')
                 if answer == 'y':
@@ -170,18 +188,18 @@ class game():
             else: 
                 return '[x] Challenge #%s already exists.' % (number)
 
-        def add_challenge_data(self,number,authorization):
-            if len(self.get_challenge_data(number)) == 0:
-                return
+        def solve_challenge(self,number,answer):
+            if len(self.get_challenge(number)) == 0:
+                return '[+] Correct!'
             else:
-                return '[x] Data for challenge #%s already exists.' % (number)
+                return '[x] Challenge #%s does not exist.' % (number)
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--create-scoreboard')
-    parser.add_argument('--scoreboard',default='scoreboard.db')
+    parser.add_argument('--scoreboard')
     parser.add_argument('--create-database')
-    parser.add_argument('--database',default='challenges.db')
+    parser.add_argument('--database')
     args = parser.parse_args()
     dashes = '-----------------------------------'
     motd = '[+] Welcome to the YellowTeam CTF!'
@@ -191,3 +209,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# REFERENCES
+# https://stackoverflow.com/questions/3389574/check-if-multiple-strings-exist-in-another-string
