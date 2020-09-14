@@ -134,7 +134,7 @@ class game():
                     solution TEXT, data TEXT)'''
                 self.api(create_table,None)
             if args.add_challenges:
-                self.read_csv_file(args.add_challenges)
+                self.add_game_file(args.add_challenges)
                 exit()
 
         def api(self,action,parameters):
@@ -158,7 +158,7 @@ class game():
                 return False
 
         def get_challenge(self,number):
-            query = '''SELECT challenge FROM challenges 
+            query = '''SELECT challenge,string FROM challenges 
                 WHERE number = ?'''
             number = (number,)
             record = self.api(query,number)
@@ -168,7 +168,7 @@ class game():
                 return record
 
         def get_challenge_data(self,number):
-            query = '''SELECT data FROM challenges 
+            query = '''SELECT data,string FROM data 
                 WHERE number = ?'''
             number = (number,)
             record = self.api(query,number)
@@ -182,25 +182,45 @@ class game():
             if len(self.get_challenge(number)) == 0:
                 if type(solution).__name__ != 'str':
                     solution = str(solution)
+                    string = False
+                else:
+                    string = True
                 if type(data).__name__ != 'str':
                     data = str(data)
-                add = '''INSERT INTO challenges VALUES (?, ?, ?, ?, ?)'''
-                record = (number, points, challenge, solution, data)
-                self.api(add,record)
-                print('[+] Added challenge #%s to the game.' % (number))
+                    string = False
+                else:
+                    string = True
+                add1 = '''INSERT INTO challenges VALUES (?, ?, ?, ?, ?)'''
+                add2 = '''INSERT INTO solutions VALUES (?, ?, ?, ?, ?)'''
+                add3 = '''INSERT INTO data VALUES (?, ?, ?, ?, ?)'''
+                record1 = (number, challenge, string)
+                record2 = (number, solution, points)
+                record3 = (number, data, string)
+                self.api(add,record1)
+                self.api(add,record2)
+                self.api(add,record3)
+                return True
             else: 
-                print('[x] Challenge #%s already exists.' % (number))
+                return False
 
-        def read_csv_file(self,filename):
+        def add_game_file(self,filename):
             if os.path.exists(filename):
                 with open(filename) as filedata:
+                    new = [] 
+                    existed = []
                     for line in filedata.readlines():
                         if line[0] != '#':
-                            self.add_challenge(*eval(line))
+                            if self.add_challenge(*eval(line)) == True:
+                                new.append(line[0])
+                            else:
+                                existed.append(line[0])
+                    print('[+] Added %s CTF challenges.' % (len(new)))
+                    if len(existed) > 0:
+                        print(' --> %s already existed.' % (','.join(existed)))
 
         def solve_challenge(self,number,answer):
             if len(self.get_challenge(number)) > 0:
-                query = '''SELECT solution FROM challenges 
+                query = '''SELECT solution FROM solutions 
                     WHERE number = ?'''
                 number = (number,)
                 record = self.api(query,number)[0][0]
