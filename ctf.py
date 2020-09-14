@@ -57,8 +57,8 @@ class game():
         query = '''SELECT username, score FROM scoreboard 
             WHERE username = ?'''
         username = (username,)
-        records = self.api(query,username)
-        return records
+        record = self.api(query,username)
+        return record
 
     def add_player(self,username,password):
         if len(self.get_player(username)) == 0:
@@ -80,9 +80,9 @@ class game():
         query = '''SELECT password FROM scoreboard 
             WHERE username = ?'''
         username = (username,)
-        records = self.api(query,username)
-        if records:
-            if password == records[0][0]: 
+        record = self.api(query,username)
+        if record:
+            if password == record[0][0]: 
                 return True
             else:
                 return False
@@ -131,8 +131,11 @@ class game():
             if self.challenges_exist() == False:
                 create_table = '''CREATE TABLE challenges 
                     (number INTEGER, points INTEGER, challenge TEXT, 
-                    solution BLOB, data BLOB)'''
+                    solution TEXT, data TEXT)'''
                 self.api(create_table,None)
+            if args.add_challenges:
+                self.read_csv_file(args.add_challenges)
+                exit()
 
         def api(self,action,parameters):
             if parameters == None:
@@ -158,38 +161,51 @@ class game():
             query = '''SELECT challenge FROM challenges 
                 WHERE number = ?'''
             number = (number,)
-            records = self.api(query,number)
-            if len(records) > 0:
-                return records[0][0]
+            record = self.api(query,number)
+            if len(record) > 0:
+                return record[0][0]
             else: 
-                return records
+                return record
 
         def get_challenge_data(self,number):
             query = '''SELECT data FROM challenges 
                 WHERE number = ?'''
             number = (number,)
-            records = self.api(query,number)
-            if len(records) > 0:
-                return records[0][0]
+            record = self.api(query,number)
+            if len(record) > 0:
+                data = eval(record[0][0])
+                return data
             else:
-                return records
+                return record
 
         def add_challenge(self,number,points,challenge,solution,data):
             if len(self.get_challenge(number)) == 0:
+                if type(solution).__name__ != 'str':
+                    solution = str(solution)
+                if type(data).__name__ != 'str':
+                    data = str(data)
                 add = '''INSERT INTO challenges VALUES (?, ?, ?, ?, ?)'''
                 record = (number, points, challenge, solution, data)
                 self.api(add,record)
-                return '[+] Added challenge #%s to the game.' % (number)
+                print('[+] Added challenge #%s to the game.' % (number))
             else: 
-                return '[x] Challenge #%s already exists.' % (number)
+                print('[x] Challenge #%s already exists.' % (number))
+
+        def read_csv_file(self,filename):
+            if os.path.exists(filename):
+                with open(filename) as filedata:
+                    for line in filedata.readlines():
+                        if line[0] != '#':
+                            self.add_challenge(*eval(line))
 
         def solve_challenge(self,number,answer):
             if len(self.get_challenge(number)) > 0:
                 query = '''SELECT solution FROM challenges 
                     WHERE number = ?'''
                 number = (number,)
-                solution = self.api(query,number)[0][0]
-                if solution == answer:
+                record = self.api(query,number)[0][0]
+                solution = eval(record)
+                if answer == solution:
                     return '[+] Correct!'
                 else:
                     return '[x] Incorrect.'
@@ -215,3 +231,4 @@ if __name__ == '__main__':
 
 # REFERENCES
 # https://stackoverflow.com/questions/3389574/check-if-multiple-strings-exist-in-another-string
+# https://stackoverflow.com/questions/19112735/how-to-print-a-list-of-tuples-with-no-brackets-in-python
