@@ -1,4 +1,4 @@
-# YellowTeam CTF
+# ctfconsole
 ![yellow.gif](/_misc/yellow.gif)
 
 ## Table of Contents
@@ -13,37 +13,34 @@ git clone https://github.com/cyberphor/yellowteam-ctf.git
 ```
 
 ## Usage
-### Starting the CTF
+### Starting ctfconsole
 ```
-ctf.py
+./ctfconsole.py
 ```
 ### Solving a Challenge
 ```
 -----------------------------------
 [+] Welcome to the YellowTeam CTF!
 -----------------------------------
->>> ctf.get_challenge(1)
+>>> ctf.challenge(1)
 'What is the sum of ctf.data(1) + 1?'
 >>> ctf.data(1)
 22
 >>> ctf.solve(1,ctf.data(1)+1)
 '[+] Correct!'
 ```
-### Adding a Challenge 
+### Adding Challenges for Your Own CTF Event
 ```
->>> ctf.admin.add_challenge(42)
-[>] Challenge: Carve-out and hash the JPEG found in ctf.data(42).
-[>] Solution: 5eb63bbbe01eeed093cb22bb8f5acdc3
-[>] Points: 5
-[>] Are you sure? (y/n) y
-'[+] Added challenge #42 to the game.'
+./ctfconsole.py --add-challenges YellowTeam-CTF.csv
+[+] Added 75 CTF challenges.
+ --> 23, 42, 69 already existed.
 ```
 
 ## What is a Yellow Team?
 > These are the people that build and design software, systems, and integrations that make businesses more efficient. Application developers, software engineers and architects fall into this category. <br> - Hackernoon
 
-## References
-* [Hackernoon - "Introducing the InfoSec colour wheel — blending developers with red and blue security teams."](https://hackernoon.com/introducing-the-infosec-colour-wheel-blending-developers-with-red-and-blue-security-teams-6437c1a07700)
-
 ## Copyright
 This project is licensed under the terms of the [MIT license](/_misc/LICENSE).
+
+## References
+* [Hackernoon - "Introducing the InfoSec colour wheel — blending developers with red and blue security teams."](https://hackernoon.com/introducing-the-infosec-colour-wheel-blending-developers-with-red-and-blue-security-teams-6437c1a07700)
