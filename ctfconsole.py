@@ -24,15 +24,14 @@ class game():
             self.scoreboard = 'scoreboard.sqlite'
         self.connection = sqlite3.connect(self.scoreboard)
         self.cursor = self.connection.cursor()
-        self.admin = self.administrator(args)
-        self.challenge = self.admin.get_challenge
-        self.data = self.admin.get_challenge_data
-        self.solve = self.admin.solve_challenge
+        self.get = self.administrator(args).get_challenge
+        self.data = self.administrator(args).get_challenge_data
+        self.solve = self.administrator(args).solve_challenge
         if self.scoreboard_exists() == False:
             create_table = '''CREATE TABLE scoreboard
                 (username TEXT, password TEXT, score INTEGER)'''
             self.api(create_table,None)
-       
+
     def api(self,action,parameters):
         if parameters == None:
             records = self.cursor.execute(action).fetchall()
@@ -131,12 +130,13 @@ class game():
             if self.challenges_exist() == False:
                 create_table = '''CREATE TABLE challenges 
                     (number INTEGER, points INTEGER, challenge TEXT, 
-                    solution TEXT, data TEXT)'''
+                    data TEXT, data_type TEXT, 
+                    solution TEXT, solution_type TEXT)'''
                 self.api(create_table,None)
             if args.add_challenges:
                 self.add_game_file(args.add_challenges)
                 exit()
-
+       
         def api(self,action,parameters):
             if parameters == None:
                 records = self.cursor.execute(action).fetchall()
@@ -158,7 +158,7 @@ class game():
                 return False
 
         def get_challenge(self,number):
-            query = '''SELECT challenge,string FROM challenges 
+            query = '''SELECT challenge FROM challenges 
                 WHERE number = ?'''
             number = (number,)
             record = self.api(query,number)
@@ -168,37 +168,29 @@ class game():
                 return record
 
         def get_challenge_data(self,number):
-            query = '''SELECT data,string FROM data 
+            query = '''SELECT data,data_type FROM challenges 
                 WHERE number = ?'''
             number = (number,)
             record = self.api(query,number)
             if len(record) > 0:
-                data = eval(record[0][0])
-                return data
+                if record[0][1] != 'str':
+                    return eval(record[0][0])
+                else:
+                    return record[0][0]
             else:
                 return record
 
-        def add_challenge(self,number,points,challenge,solution,data):
+        def add_challenge(self,number,points,challenge,data,solution):
             if len(self.get_challenge(number)) == 0:
-                if type(solution).__name__ != 'str':
-                    solution = str(solution)
-                    string = False
-                else:
-                    string = True
-                if type(data).__name__ != 'str':
-                    data = str(data)
-                    string = False
-                else:
-                    string = True
-                add1 = '''INSERT INTO challenges VALUES (?, ?, ?, ?, ?)'''
-                add2 = '''INSERT INTO solutions VALUES (?, ?, ?, ?, ?)'''
-                add3 = '''INSERT INTO data VALUES (?, ?, ?, ?, ?)'''
-                record1 = (number, challenge, string)
-                record2 = (number, solution, points)
-                record3 = (number, data, string)
-                self.api(add,record1)
-                self.api(add,record2)
-                self.api(add,record3)
+                add = '''INSERT INTO challenges VALUES 
+                    (?, ?, ?, ?, ?, ?, ?)'''
+                data_type = type(data).__name__
+                data = str(data)
+                solution_type = type(solution).__name__
+                solution = str(solution)
+                record = (number,points,challenge,
+                    data,data_type,solution,solution_type)
+                self.api(add,record)
                 return True
             else: 
                 return False
@@ -220,15 +212,19 @@ class game():
 
         def solve_challenge(self,number,answer):
             if len(self.get_challenge(number)) > 0:
-                query = '''SELECT solution FROM solutions 
+                query = '''SELECT solution,solution_type FROM challenges 
                     WHERE number = ?'''
                 number = (number,)
-                record = self.api(query,number)[0][0]
-                solution = eval(record)
+                record = self.api(query,number)
+                if record[0][1] != 'str':
+                    solution = eval(record[0][0])
+                else:
+                    solution = record[0][0]
                 if answer == solution:
                     return '[+] Correct!'
                 else:
                     return '[x] Incorrect.'
+                    #return '[x] Incorrect.', record, solution
             else:
                 return '[x] Challenge #%s does not exist.' % (number)
 
