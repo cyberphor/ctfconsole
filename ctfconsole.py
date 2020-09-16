@@ -24,13 +24,15 @@ class game():
             self.scoreboard = 'scoreboard.sqlite'
         self.connection = sqlite3.connect(self.scoreboard)
         self.cursor = self.connection.cursor()
-        self.get = self.administrator(args).get_challenge
-        self.data = self.administrator(args).get_challenge_data
-        self.solve = self.administrator(args).solve_challenge
         if self.scoreboard_exists() == False:
             create_table = '''CREATE TABLE scoreboard
                 (username TEXT, password TEXT, score INTEGER)'''
             self.api(create_table,None)
+        self.authenticated = False
+        self.username = ''
+        self.admin = self.administrator(args)
+        self.get = self.admin.get_challenge
+        self.data = self.admin.get_challenge_data
 
     def api(self,action,parameters):
         if parameters == None:
@@ -61,13 +63,21 @@ class game():
 
     def add_player(self,username,password):
         if len(self.get_player(username)) == 0:
-            password = hashlib.sha512(password.encode('UTF-8')).hexdigest()
             add = '''INSERT INTO scoreboard VALUES (?, ?, ?)'''
+            password = hashlib.sha512(password.encode('UTF-8')).hexdigest()
             record = (username, password, 0)
             self.api(add,record)
             return '[+] Added %s to the scoreboard.' % (username)
         else: 
             return '[x] The username %s is already taken.' % (username)
+
+    def login(self,username,password):
+        if len(self.get_player(username)) != 0:
+            if self.correct_password(username,password) == True:
+                self.authenticated = True
+                self.username = username
+        else:
+            return '[x] Invalid credentials.'
 
     def get_scores(self):
         query = '''SELECT username, score FROM scoreboard'''
@@ -75,9 +85,9 @@ class game():
         return records
 
     def correct_password(self,username,password):
-        password = hashlib.sha512(password.encode('UTF-8')).hexdigest()
         query = '''SELECT password FROM scoreboard 
             WHERE username = ?'''
+        password = hashlib.sha512(password.encode('UTF-8')).hexdigest()
         username = (username,)
         record = self.api(query,username)
         if record:
@@ -99,17 +109,30 @@ class game():
         else:
             return '[x] Invalid credentials.'
 
-    def update_score(self,username,password,new_points):
-        if self.correct_password(username,password) == True:
-            update = '''UPDATE players SET score = ?
+    def update_score(self,username,points):
+        if self.authenticated == True:
+            update = '''UPDATE scoreboard SET score = ?
                 WHERE username = ?'''
-            score = self.get_player(username)[0][1] + new_points
+            score = self.get_player(username)[0][1] + points
             record = (username, score)
             self.api(update,record)
-            return '[+] Updated the scoreboard.'
+            return '[+] %s earned %s points. New score: %s' % (username,points,score)
         else:
-            return '[x] Invalid credentials.'
+            return '[x] Please login first.'
 
+    def solve(self,number,answer):
+        if self.authenticated == True:
+            attempt, points = self.admin.get_solution(number,answer)
+            if attempt == True:
+                self.update_score(self.username, points)
+                return '[+] Correct!'
+            elif attempt == False:
+                return '[x] Incorrect.'
+            else:
+                return attempt
+        else:
+            return '[x] Please login first.'
+    
     class administrator():
         def __init__(self,args):
             if args.use_database and os.path.exists(args.use_database):
@@ -210,31 +233,34 @@ class game():
                     if len(existed) > 0:
                         print(' --> %s already existed.' % (','.join(existed)))
 
-        def solve_challenge(self,number,answer):
+        def get_solution(self,number,answer):
             if len(self.get_challenge(number)) > 0:
-                query = '''SELECT solution,solution_type FROM challenges 
+                query = '''SELECT solution,solution_type,points FROM challenges 
                     WHERE number = ?'''
                 number = (number,)
                 record = self.api(query,number)
+                points = record[0][2]
                 if record[0][1] != 'str':
                     solution = eval(record[0][0])
                 else:
                     solution = record[0][0]
                 if answer == solution:
-                    return '[+] Correct!'
+                    return True, points
                 else:
-                    return '[x] Incorrect.'
-                    #return '[x] Incorrect.', record, solution
+                    return False, 0
             else:
-                return '[x] Challenge #%s does not exist.' % (number)
+                return ('[x] Challenge #%s does not exist.' % (number)), 0
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--create-scoreboard')
     parser.add_argument('--use-scoreboard')
+    parser.add_argument('-s')
     parser.add_argument('--create-database')
     parser.add_argument('--use-database')
+    parser.add_argument('-d')
     parser.add_argument('--add-challenges')
+    parser.add_argument('-a')
     args = parser.parse_args()
     dashes = '-----------------------------------'
     motd = '[+] Welcome to the YellowTeam CTF!'
