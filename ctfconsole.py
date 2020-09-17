@@ -54,13 +54,6 @@ class game():
         else:
             return False
 
-    def get_player(self,username):
-        query = '''SELECT username, score FROM scoreboard 
-            WHERE username = ?'''
-        username = (username,)
-        record = self.api(query,username)
-        return record
-
     def add_player(self,username,password):
         if len(self.get_player(username)) == 0:
             add = '''INSERT INTO scoreboard VALUES (?, ?, ?)'''
@@ -71,18 +64,12 @@ class game():
         else: 
             return '[x] The username %s is already taken.' % (username)
 
-    def login(self,username,password):
-        if len(self.get_player(username)) != 0:
-            if self.correct_password(username,password) == True:
-                self.authenticated = True
-                self.username = username
-        else:
-            return '[x] Invalid credentials.'
-
-    def get_scores(self):
-        query = '''SELECT username, score FROM scoreboard'''
-        records = self.api(query,None)
-        return records
+    def get_player(self,username):
+        query = '''SELECT username, score FROM scoreboard 
+            WHERE username = ?'''
+        username = (username,)
+        record = self.api(query,username)
+        return record
 
     def correct_password(self,username,password):
         query = '''SELECT password FROM scoreboard 
@@ -96,25 +83,46 @@ class game():
             else:
                 return False
 
-    def authorization(self):
-        print('if correct admin password, self.authorization = "granted"')
-
-    def remove_player(self,username,password):
-        if self.correct_password(username,password) == True:
-            delete = '''DELETE FROM scoreboard
-                WHERE username = ?'''
-            username = (username,)
-            self.api(delete,username)
-            return '[!] Removed %s from the scoreboard.' % (username)
+    def login(self,username,password):
+        if len(self.get_player(username)) != 0:
+            if self.correct_password(username,password) == True:
+                self.authenticated = True
+                self.username = username
         else:
             return '[x] Invalid credentials.'
+
+    def logout(self):
+        if self.authenticated == True:
+            self.authenticated = False
+            self.username = ''
+            return '[+] Successfully logged-out.'
+        else:
+            return '[x] Please login first.'
+
+    def remove_player(self,username,password):
+        if self.authenticated == False:
+            if self.correct_password(username,password) == True:
+                delete = '''DELETE FROM scoreboard
+                    WHERE username = ?'''
+                username = (username,)
+                self.api(delete,username)
+                return '[!] Removed %s from the scoreboard.' % (username)
+            else:
+                return '[x] Invalid credentials.'
+        else:
+            return '[x] Please logout first.'
+
+    def scores(self):
+        query = '''SELECT username, score FROM scoreboard'''
+        records = self.api(query,None)
+        return records
 
     def update_score(self,username,points):
         if self.authenticated == True:
             update = '''UPDATE scoreboard SET score = ?
                 WHERE username = ?'''
             score = self.get_player(username)[0][1] + points
-            record = (username, score)
+            record = (score,username)
             self.api(update,record)
             return '[+] %s earned %s points. New score: %s' % (username,points,score)
         else:
@@ -254,13 +262,10 @@ class game():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--create-scoreboard')
-    parser.add_argument('--use-scoreboard')
-    parser.add_argument('-s')
+    parser.add_argument('--use-scoreboard','-s')
     parser.add_argument('--create-database')
-    parser.add_argument('--use-database')
-    parser.add_argument('-d')
-    parser.add_argument('--add-challenges')
-    parser.add_argument('-a')
+    parser.add_argument('--use-database','-d')
+    parser.add_argument('--add-challenges','-a')
     args = parser.parse_args()
     dashes = '-----------------------------------'
     motd = '[+] Welcome to the YellowTeam CTF!'
