@@ -91,6 +91,7 @@ class game():
             if self.correct_password(username,password) == True:
                 self.authenticated = True
                 self.username = username
+                return ('[+] %s has entered the game.' % (self.username))
         else:
             return '[x] Invalid credentials.'
 
@@ -109,7 +110,7 @@ class game():
                     WHERE username = ?'''
                 username = (username,)
                 self.api(delete,username)
-                return '[!] Removed %s from the scoreboard.' % (username)
+                return '[+] Removed %s from the scoreboard.' % (username)
             else:
                 return '[x] Invalid credentials.'
         else:
@@ -118,27 +119,25 @@ class game():
     def scores(self):
         query = '''SELECT username, score, solved FROM scoreboard'''
         records = self.api(query,None)
-        return records
-
-    def update_score(self,username,solved,points):
-        if self.authenticated == True:
-            update = '''UPDATE scoreboard SET score = ?, solved = ?
-                WHERE username = ?'''
-            score = self.get_player(username)[0][1] + points
-            record = (score,solved,username)
-            self.api(update,record)
-            return '[+] %s earned %s points. New score: %s' % (username,points,score)
-        else:
-            return '[x] Please login first.'
+        scoreboard = sorted(records, key = lambda x: x[1], reverse = True)
+        for player in scoreboard:
+            username = player[0]
+            score = player[1]
+            solved = player[2]
+            print(score, '\t', username, '\t', solved)
 
     def solve(self,number,answer):
         if self.authenticated == True:
             solved = eval(self.get_player(self.username)[0][2])
-            attempt, points = self.admin.get_solution(number,answer)
             if number not in solved:
+                attempt, points = self.admin.get_solution(number,answer)
                 if attempt == True:
+                    update = '''UPDATE scoreboard SET solved = ?, score = ?
+                        WHERE username = ?'''
                     solved.append(number)
-                    self.update_score(self.username,str(solved),points)
+                    score = self.get_player(self.username)[0][1] + points
+                    record = (str(solved),score,self.username)
+                    self.api(update,record)
                     return '[+] Correct!'
                 elif attempt == False:
                     return '[x] Incorrect.'
@@ -207,7 +206,7 @@ class game():
                 return record
 
         def get_challenge_data(self,number):
-            query = '''SELECT data,data_type FROM challenges 
+            query = '''SELECT data, data_type FROM challenges 
                 WHERE number = ?'''
             number = (number,)
             record = self.api(query,number)
@@ -251,8 +250,8 @@ class game():
 
         def get_solution(self,number,answer):
             if len(self.get_challenge(number)) > 0:
-                query = '''SELECT solution,solution_type,points FROM challenges 
-                    WHERE number = ?'''
+                query = '''SELECT solution, solution_type, points 
+                    FROM challenges WHERE number = ?'''
                 number = (number,)
                 record = self.api(query,number)
                 points = record[0][2]
@@ -273,6 +272,7 @@ def main():
     parser.add_argument('--use-scoreboard','-s')
     parser.add_argument('--create-database')
     parser.add_argument('--use-database','-d')
+    parser.add_argument('--event-name','-e')
     parser.add_argument('--add-challenges','-a')
     args = parser.parse_args()
     dashes = '-----------------------------------'
@@ -287,3 +287,5 @@ if __name__ == '__main__':
 # REFERENCES
 # https://stackoverflow.com/questions/3389574/check-if-multiple-strings-exist-in-another-string
 # https://stackoverflow.com/questions/19112735/how-to-print-a-list-of-tuples-with-no-brackets-in-python
+# https://stackoverflow.com/questions/36955553/sorting-list-of-lists-by-the-first-element-of-each-sub-list
+# https://www.programiz.com/python-programming/methods/built-in/sorted
