@@ -26,7 +26,8 @@ class game():
         self.cursor = self.connection.cursor()
         if self.scoreboard_exists() == False:
             create_table = '''CREATE TABLE scoreboard
-                (username TEXT, password TEXT, score INTEGER)'''
+                (username TEXT, password TEXT,
+                score INTEGER, solved BLOB)'''
             self.api(create_table,None)
         self.authenticated = False
         self.username = ''
@@ -56,16 +57,18 @@ class game():
 
     def add_player(self,username,password):
         if len(self.get_player(username)) == 0:
-            add = '''INSERT INTO scoreboard VALUES (?, ?, ?)'''
+            add = '''INSERT INTO scoreboard VALUES (?, ?, ?, ?)'''
             password = hashlib.sha512(password.encode('UTF-8')).hexdigest()
-            record = (username, password, 0)
+            score = 0
+            solved = str([])
+            record = (username, password, score, solved)
             self.api(add,record)
             return '[+] Added %s to the scoreboard.' % (username)
         else: 
             return '[x] The username %s is already taken.' % (username)
 
     def get_player(self,username):
-        query = '''SELECT username, score FROM scoreboard 
+        query = '''SELECT username, score, solved FROM scoreboard 
             WHERE username = ?'''
         username = (username,)
         record = self.api(query,username)
@@ -113,16 +116,16 @@ class game():
             return '[x] Please logout first.'
 
     def scores(self):
-        query = '''SELECT username, score FROM scoreboard'''
+        query = '''SELECT username, score, solved FROM scoreboard'''
         records = self.api(query,None)
         return records
 
-    def update_score(self,username,points):
+    def update_score(self,username,solved,points):
         if self.authenticated == True:
-            update = '''UPDATE scoreboard SET score = ?
+            update = '''UPDATE scoreboard SET score = ?, solved = ?
                 WHERE username = ?'''
             score = self.get_player(username)[0][1] + points
-            record = (score,username)
+            record = (score,solved,username)
             self.api(update,record)
             return '[+] %s earned %s points. New score: %s' % (username,points,score)
         else:
@@ -130,14 +133,19 @@ class game():
 
     def solve(self,number,answer):
         if self.authenticated == True:
+            solved = eval(self.get_player(self.username)[0][2])
             attempt, points = self.admin.get_solution(number,answer)
-            if attempt == True:
-                self.update_score(self.username, points)
-                return '[+] Correct!'
-            elif attempt == False:
-                return '[x] Incorrect.'
+            if number not in solved:
+                if attempt == True:
+                    solved.append(number)
+                    self.update_score(self.username,str(solved),points)
+                    return '[+] Correct!'
+                elif attempt == False:
+                    return '[x] Incorrect.'
+                else:
+                    return attempt
             else:
-                return attempt
+                return '[x] You have already solved this challenge.'
         else:
             return '[x] Please login first.'
     
