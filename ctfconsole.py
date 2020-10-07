@@ -289,3 +289,4 @@ if __name__ == '__main__':
 # https://stackoverflow.com/questions/19112735/how-to-print-a-list-of-tuples-with-no-brackets-in-python
 # https://stackoverflow.com/questions/36955553/sorting-list-of-lists-by-the-first-element-of-each-sub-list
 # https://www.programiz.com/python-programming/methods/built-in/sorted
+# https://www.thepythoncode.com/article/create-reverse-shell-python
