@@ -4,12 +4,16 @@
 ## Table of Contents
 * [Installation](#installation)
 * [Usage](#usage)
+  * [Starting ctfconsole](#starting-ctfconsole)
+  * [Solving a Challenge](#solving-a-challenge)
+  * [Adding Challenges for Your Own CTF Event](#adding-challenges-for-your-own-ctf-event)
 * [What is a Yellow Team?](#what-is-a-yellow-team)
+* [Copyright](#copyright)
 * [References](#references)
 
 ## Installation
 ```bash
-git clone https://github.com/cyberphor/yellowteam-ctf.git
+git clone https://github.com/cyberphor/ctfconsole.git
 ```
 
 ## Usage
