@@ -1,5 +1,0 @@
-# number, points, challenge, data, solution
-1,1,'What is the sum of ctf.data(1) + 1?',22,23
-2,1,'What is the difference between ctf.data(1) and ctf.data(2)?',22,0
-3,1,'What is the first element in ctf.data(3)?',(1,2,3),1
-4,1,'What is the product of ctf.data(2) and ctf.data(4)?',2,44
