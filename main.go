@@ -1,6 +1,10 @@
 package main
 
 func main() {
-    CreateScoreboard()
-    ServeHtml()
+	CreateAdminsTable()
+	CreatePlayersTable()
+	CreateAdmin("elliot", "bug")
+	CreatePlayer("victor", "password")
+	ReadAdminsTable()
+	ServeWebApp()
 }
