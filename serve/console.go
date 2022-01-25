@@ -7,8 +7,8 @@ import (
 	"github.com/cyberphor/ctfconsole/read"
 )
 
-func playersPage(w http.ResponseWriter, r *http.Request) {
-	page, err := template.ParseFiles("./templates/players.html")
+func scoreboardPage(w http.ResponseWriter, r *http.Request) {
+	page, err := template.ParseFiles("./templates/scoreboard.html")
 	if err != nil {
 		panic(err)
 	}
@@ -20,7 +20,7 @@ func Console() {
 	filePath := http.Dir("./templates/")
 	fileServer := http.FileServer(filePath)
 	http.Handle("/", fileServer)
-	playersPageHandler := http.HandlerFunc(playersPage)
-	http.Handle("/players.html", playersPageHandler)
+	scoreboardPageHandler := http.HandlerFunc(scoreboardPage)
+	http.Handle("/scoreboard.html", scoreboardPageHandler)
 	http.ListenAndServe(":8000", nil)
 }

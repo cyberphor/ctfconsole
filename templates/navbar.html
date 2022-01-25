@@ -7,9 +7,6 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="/players.html">Players</a>
-          </li>
-          <li class="nav-item">
             <a class="nav-link" href="/teams.html">Teams</a>
           </li>
           <li class="nav-item">
@@ -18,22 +15,23 @@
           <li class="nav-item">
             <a class="nav-link" href="/scoreboard.html">Scoreboard</a>
           </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Admin
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-              <li><a class="dropdown-item" href="/admin/create-ctf.html">Create CTF</a></li>
-              <li><a class="dropdown-item" href="/admin/create-player.html">Create Player</a></li>
-              <li><a class="dropdown-item" href="/admin/edit-ctf.html">Edit CTF</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="/admin/delete-ctf.html">Delete CTF</a></li>
-            </ul>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled">Disabled</a>
-          </li>
         </ul>
+        <div class="form-inline navbar-nav">
+          <form class="d-flex">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Admin
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="/admin/create-ctf.html">Create CTF</a></li>
+                <li><a class="dropdown-item" href="/admin/edit-ctf.html">Edit CTF</a></li>
+                <li><a class="dropdown-item" href="/admin/delete-ctf.html">Delete CTF</a></li>
+              </ul>
+            </li>
+          </form>
+          <a class="nav-link" href="/register.html">Register</a>
+          <a class="nav-link" href="/login.html">Login</a>
+        </div>
       </div>
     </div>
   </nav>
