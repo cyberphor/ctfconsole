@@ -2,8 +2,8 @@ package create
 
 import "database/sql"
 
-func CreateAdmin(username string, password string) {
-	database, err := sql.Open("sqlite3", "./ctfconsole.db")
+func Admin(username string, password string) {
+	database, err := sql.Open("sqlite3", "ctfconsole.db")
 	if err != nil {
 		panic(err)
 	}

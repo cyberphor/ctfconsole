@@ -2,15 +2,13 @@ package main
 
 import (
 	"github.com/cyberphor/ctfconsole/create"
-	"github.com/cyberphor/ctfconsole/list"
 	"github.com/cyberphor/ctfconsole/serve"
 )
 
 func main() {
 	create.TableForAdmins()
 	create.TableForPlayers()
-	create.CreateAdmin("elliot", "bug")
-	create.CreatePlayer("victor", "password")
-	list.ListPlayers()
+	create.Admin("elliot", "bug")
+	create.Player("victor", "password")
 	serve.Console()
 }

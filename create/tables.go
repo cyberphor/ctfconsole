@@ -7,7 +7,7 @@ import (
 )
 
 func TableForAdmins() {
-	database, err := sql.Open("sqlite3", "./ctfconsole.db")
+	database, err := sql.Open("sqlite3", "ctfconsole.db")
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +26,7 @@ func TableForAdmins() {
 }
 
 func TableForPlayers() {
-	database, err := sql.Open("sqlite3", "../ctfconsole.db")
+	database, err := sql.Open("sqlite3", "ctfconsole.db")
 	if err != nil {
 		panic(err)
 	}

@@ -1,14 +1,13 @@
-package list
+package read
 
-import "database/sql"
+import (
+	"database/sql"
 
-type PlayerData struct {
-	Username string
-	Password string
-}
+	"github.com/cyberphor/ctfconsole/models"
+)
 
-func ListPlayers() []PlayerData {
-	database, err := sql.Open("sqlite3", "./ctfconsole.db")
+func Players() []models.PlayerData {
+	database, err := sql.Open("sqlite3", "ctfconsole.db")
 	if err != nil {
 		panic(err)
 	}
@@ -17,12 +16,12 @@ func ListPlayers() []PlayerData {
 	if err != nil {
 		panic(err)
 	}
-	var Players []PlayerData
+	var Players []models.PlayerData
 	var username string
 	var password string
 	for rows.Next() {
 		rows.Scan(&username, &password)
-		Player := PlayerData{
+		Player := models.PlayerData{
 			Username: username,
 			Password: password,
 		}
