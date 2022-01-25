@@ -1,4 +1,4 @@
-module ctfconsole
+module github.com/cyberphor/ctfconsole
 
 go 1.17
 
