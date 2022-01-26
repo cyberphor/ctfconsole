@@ -9,6 +9,6 @@ func main() {
 	create.TableForAdmins()
 	create.TableForPlayers()
 	create.Admin("elliot", "bug")
-	create.Player("victor", "password")
+	create.Player("victor", "password", "Blue Team")
 	serve.Console()
 }

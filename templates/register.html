@@ -12,28 +12,28 @@
   <body> 
     <div id="navbar"></div>
     <div class="d-flex justify-content-center">
-      <form action="/register.html" method="POST">
-        <div class="form-group row">
-          <label for="username" class="pt-2 col-sm-4 col-form-label">Username</label>
-          <div class="pt-2 col-sm">
-            <input type="username" class="form-control" id="username">
+      <form action="/submitRegistration" method="POST">
+        <div class="form-group">
+          <label for="username" class="col-sm-4 col-form-label">Username</label>
+          <div class="col-sm">
+            <input type="text" name="username" class="form-control">
           </div>
         </div>
-        <div class="form-group row">
-          <label for="password" class="pt-2 col-sm-4 col-form-label">Password</label>
-          <div class="pt-2 col-sm">
-            <input type="password" class="form-control" id="password">
+        <div class="form-group">
+          <label for="password" class="col-sm-4 col-form-label">Password</label>
+          <div class="col-sm">
+            <input type="password" name="password" class="form-control">
           </div>
         </div>
-        <div class="form-group row">
-          <label for="team" class="pt-2 col-sm-4 col-form-label">Team</label>
-          <select id="team" class="form-control">
+        <div class="form-group">
+          <label for="team" class="col-sm-4 col-form-label">Team</label>
+          <select name="team" class="form-control">
             <option selected>Single Player</option>
             <option>Red Team</option>
             <option>Blue Team</option>
           </select>
         </div>
-        <div class="form-group row">
+        <div class="form-group">
           <div class="pt-2 d-flex justify-content-end">
             <button type="submit" class="btn btn-primary">Submit</button>
           </div>

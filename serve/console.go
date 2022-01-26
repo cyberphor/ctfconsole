@@ -5,20 +5,35 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/cyberphor/ctfconsole/create"
 	"github.com/cyberphor/ctfconsole/read"
 )
 
-func registerPage(w http.ResponseWriter, r *http.Request) {
+func submitRegistration(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/login.html", http.StatusSeeOther)
+		return
+	} else {
+		create.Player(r.FormValue("username"), r.FormValue("password"), r.FormValue("team"))
+		http.Redirect(w, r, "/login.html", http.StatusSeeOther)
+		return
+	}
+}
+
+func submitLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	} else {
-		fmt.Println("username:", r.FormValue("username"))
-		fmt.Println("password:", r.FormValue("password"))
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+		fmt.Println(username, password)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
 	}
 }
 
-func scoreboardPage(w http.ResponseWriter, r *http.Request) {
+func showScoreboard(w http.ResponseWriter, r *http.Request) {
 	page, err := template.ParseFiles("./templates/scoreboard.html")
 	if err != nil {
 		panic(err)
@@ -32,10 +47,8 @@ func Console() {
 	fileServer := http.FileServer(filePath)
 	http.Handle("/", fileServer)
 
-	scoreboardPageHandler := http.HandlerFunc(scoreboardPage)
-	http.Handle("/scoreboard.html", scoreboardPageHandler)
-
-	registerPageHandler := http.HandlerFunc(registerPage)
-	http.Handle("/register.html", registerPageHandler)
+	http.HandleFunc("/scoreboard.html", showScoreboard)
+	http.HandleFunc("/submitRegistration", submitRegistration)
+	http.HandleFunc("/submitLogin", submitLogin)
 	http.ListenAndServe(":8000", nil)
 }

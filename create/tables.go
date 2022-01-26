@@ -32,8 +32,9 @@ func TableForPlayers() {
 	}
 	statement := `CREATE TABLE IF NOT EXISTS players (
 		id INTEGER PRIMARY KEY,
-		username  TEXT,
-		password  TEXT,
+		username TEXT,
+		password TEXT,
+		team TEXT,
 		UNIQUE(username)
 		);`
 	query, err := database.Prepare(statement)

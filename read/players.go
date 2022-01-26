@@ -11,7 +11,7 @@ func Players() []models.PlayerData {
 	if err != nil {
 		panic(err)
 	}
-	statement := `SELECT username,password FROM players;`
+	statement := `SELECT username,password,team FROM players;`
 	rows, err := database.Query(statement)
 	if err != nil {
 		panic(err)
@@ -19,11 +19,13 @@ func Players() []models.PlayerData {
 	var Players []models.PlayerData
 	var username string
 	var password string
+	var team string
 	for rows.Next() {
-		rows.Scan(&username, &password)
+		rows.Scan(&username, &password, &team)
 		Player := models.PlayerData{
 			Username: username,
 			Password: password,
+			Team:     team,
 		}
 		Players = append(Players, Player)
 	}
