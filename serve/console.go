@@ -9,13 +9,13 @@ import (
 )
 
 func registerPage(w http.ResponseWriter, r *http.Request) {
-	page, err := template.ParseFiles("./templates/register.html")
-	if err != nil {
-		panic(err)
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	} else {
+		fmt.Println("username:", r.FormValue("username"))
+		fmt.Println("password:", r.FormValue("password"))
 	}
-	page.Execute(w, nil)
-	r.ParseForm()
-	fmt.Println(r)
 }
 
 func scoreboardPage(w http.ResponseWriter, r *http.Request) {
