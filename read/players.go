@@ -3,6 +3,7 @@ package read
 import (
 	"database/sql"
 
+	"github.com/cyberphor/ctfconsole/create"
 	"github.com/cyberphor/ctfconsole/models"
 )
 
@@ -31,4 +32,22 @@ func Players() []models.PlayerData {
 	}
 	database.Close()
 	return Players
+}
+
+func Player(username string, password string) string {
+	database, err := sql.Open("sqlite3", "ctfconsole.db")
+	if err != nil {
+		panic(err)
+	}
+	statement := `SELECT username FROM players WHERE (username,password) = (?,?);`
+	row := database.QueryRow(statement, username, create.HashPassword(password))
+	var PlayerUsername string
+	switch err := row.Scan(&PlayerUsername); err {
+	case nil:
+		return PlayerUsername
+	case sql.ErrNoRows:
+		return "failed"
+	default:
+		panic(err)
+	}
 }
