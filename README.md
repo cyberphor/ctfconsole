@@ -4,7 +4,8 @@ ctfconsole is a Capture The Flag (CTF) server developed using the Go programming
 
 ### How to Compile
 ```bash
-git build ./cmd/ctfconsole/
+cd ctfconsole/
+go build .
 ```
 
 **TODO**  
