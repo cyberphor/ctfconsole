@@ -8,7 +8,7 @@ import (
 )
 
 func showScoreboard(w http.ResponseWriter, r *http.Request) {
-	page, err := template.ParseFiles("./templates/scoreboard.html")
+	page, err := template.ParseFiles("./views/scoreboard.html")
 	if err != nil {
 		panic(err)
 	}

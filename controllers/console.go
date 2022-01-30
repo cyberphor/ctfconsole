@@ -5,7 +5,7 @@ import (
 )
 
 func Console() {
-	filePath := http.Dir("./templates/")
+	filePath := http.Dir("./views/")
 	fileServer := http.FileServer(filePath)
 	http.Handle("/", fileServer)
 	http.HandleFunc("/scoreboard.html", showScoreboard)
