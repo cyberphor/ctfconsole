@@ -3,7 +3,7 @@ package models
 import "database/sql"
 
 func CreateAdmin(username string, password string) {
-	database, err := sql.Open("sqlite3", "./models/store.db")
+	database, err := sql.Open("sqlite3", "store/store.db")
 	if err != nil {
 		panic(err)
 	}

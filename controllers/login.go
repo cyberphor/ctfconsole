@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"html/template"
-	"io/ioutil"
 	"net/http"
 	"time"
 
@@ -25,28 +24,6 @@ type Credentials struct {
 type Claims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
-}
-
-func LoginPage(w http.ResponseWriter, r *http.Request) {
-	pageTemplate, err := template.ParseFiles("./views/page.gohtml")
-	if err != nil {
-		panic(err)
-	}
-
-	loginForm, err := ioutil.ReadFile("./views/login.html")
-	if err != nil {
-		panic(err)
-	}
-
-	loginPage := Page{
-		Title: "Login",
-		Body:  template.HTML(loginForm),
-	}
-
-	err = pageTemplate.Execute(w, loginPage)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -88,4 +65,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+}
+
+func LoginPage(w http.ResponseWriter, r *http.Request) {
+	templates.ExecuteTemplate(w, "login.gohtml", nil)
 }

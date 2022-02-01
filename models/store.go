@@ -7,7 +7,7 @@ import (
 )
 
 func CreateTableForAdmins() {
-	database, err := sql.Open("sqlite3", "./models/store.db")
+	database, err := sql.Open("sqlite3", "store/store.db")
 	if err != nil {
 		panic(err)
 	}
@@ -26,7 +26,7 @@ func CreateTableForAdmins() {
 }
 
 func CreateTableForPlayers() {
-	database, err := sql.Open("sqlite3", "./models/store.db")
+	database, err := sql.Open("sqlite3", "store/store.db")
 	if err != nil {
 		panic(err)
 	}

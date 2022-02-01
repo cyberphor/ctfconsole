@@ -9,7 +9,7 @@ type PlayerData struct {
 }
 
 func CreatePlayer(username string, password string, team string) {
-	database, err := sql.Open("sqlite3", "./models/store.db")
+	database, err := sql.Open("sqlite3", "store/store.db")
 	if err != nil {
 		panic(err)
 	}
@@ -23,7 +23,7 @@ func CreatePlayer(username string, password string, team string) {
 }
 
 func GetPlayers() []PlayerData {
-	database, err := sql.Open("sqlite3", "./models/store.db")
+	database, err := sql.Open("sqlite3", "store/store.db")
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +50,7 @@ func GetPlayers() []PlayerData {
 }
 
 func GetPlayer(username string, password string) string {
-	database, err := sql.Open("sqlite3", "./models/store.db")
+	database, err := sql.Open("sqlite3", "store/store.db")
 	if err != nil {
 		panic(err)
 	}
