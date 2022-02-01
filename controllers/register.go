@@ -6,7 +6,7 @@ import (
 	"github.com/cyberphor/ctfconsole/models"
 )
 
-func submitRegistration(w http.ResponseWriter, r *http.Request) {
+func Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/login.html", http.StatusSeeOther)
 		return

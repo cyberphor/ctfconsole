@@ -7,11 +7,13 @@ import (
 	"github.com/cyberphor/ctfconsole/models"
 )
 
-func showScoreboard(w http.ResponseWriter, r *http.Request) {
-	page, err := template.ParseFiles("./views/scoreboard.html")
+func Scoreboard(w http.ResponseWriter, r *http.Request) {
+	pageTemplate, err := template.ParseFiles("./views/scoreboard.gohtml")
 	if err != nil {
 		panic(err)
 	}
-	players := models.GetPlayers()
-	page.Execute(w, players)
+	err = pageTemplate.Execute(w, models.GetPlayers())
+	if err != nil {
+		panic(err)
+	}
 }

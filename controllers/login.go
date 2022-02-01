@@ -28,7 +28,7 @@ type Claims struct {
 }
 
 func LoginPage(w http.ResponseWriter, r *http.Request) {
-	pageTemplate, err := template.ParseFiles("./views/template.gohtml")
+	pageTemplate, err := template.ParseFiles("./views/page.gohtml")
 	if err != nil {
 		panic(err)
 	}

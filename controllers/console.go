@@ -9,8 +9,8 @@ func Console() {
 	fileServer := http.FileServer(filePath)
 	http.Handle("/static/", fileServer)
 	http.HandleFunc("/", LoginPage)
+	http.HandleFunc("/register", Register)
 	http.HandleFunc("/login", Login)
-	http.HandleFunc("/scoreboard.html", showScoreboard)
-	http.HandleFunc("/submitRegistration", submitRegistration)
+	http.HandleFunc("/scoreboard.html", Scoreboard)
 	http.ListenAndServe(":8000", nil)
 }
