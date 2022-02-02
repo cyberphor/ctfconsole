@@ -1,20 +1,15 @@
 package controllers
 
 import (
-	"html/template"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/cyberphor/ctfconsole/models"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 var key = []byte("The true crimefighter always carries everything he needs in his utility belt, Robin.")
-
-type Page struct {
-	Title string
-	Body  template.HTML
-}
 
 type Credentials struct {
 	Username string `json:"username"`
@@ -24,6 +19,36 @@ type Credentials struct {
 type Claims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
+}
+
+func CheckToken(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("token")
+	if err != nil {
+		if err == http.ErrNoCookie {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	tokenString := cookie.Value
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, claims,
+		func(t *jwt.Token) (interface{}, error) {
+			return key, nil
+		})
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if !token.Valid {
+		w.WriteHeader(http.StatusUnauthorized)
+	}
+	w.Write([]byte(fmt.Sprintf("Hello, %s", claims.Username)))
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
