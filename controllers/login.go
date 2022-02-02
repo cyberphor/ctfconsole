@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -21,34 +20,42 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func CheckToken(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			w.WriteHeader(http.StatusUnauthorized)
+func Auth(HandlerFunc http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("token")
+		if err != nil {
+			if err == http.ErrNoCookie {
+				// http.StatusBadRequest
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+				return
+			}
+			// http.StatusBadRequest
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	tokenString := cookie.Value
-	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims,
-		func(t *jwt.Token) (interface{}, error) {
-			return key, nil
-		})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			w.WriteHeader(http.StatusUnauthorized)
+		tokenString := cookie.Value
+		claims := &Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims,
+			func(t *jwt.Token) (interface{}, error) {
+				return key, nil
+			})
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				// http.StatusUnauthorized
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+				return
+			}
+			// http.StatusBadRequest
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		if !token.Valid {
+			// http.StatusUnauthorized
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		HandlerFunc.ServeHTTP(w, r)
 	}
-	if !token.Valid {
-		w.WriteHeader(http.StatusUnauthorized)
-	}
-	w.Write([]byte(fmt.Sprintf("Hello, %s", claims.Username)))
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
