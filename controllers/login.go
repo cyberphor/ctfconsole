@@ -1,60 +1,42 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/cyberphor/ctfconsole/models"
-	"github.com/golang-jwt/jwt"
 )
 
-var key = []byte("The true crimefighter always carries everything he needs in his utility belt, Robin.")
-
-type Credentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type Claims struct {
-	Username string `json:"username"`
-	jwt.StandardClaims
-}
-
-func Auth(HandlerFunc http.HandlerFunc) http.HandlerFunc {
+func Auth(roles []string, HandlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("token")
 		if err != nil {
-			if err == http.ErrNoCookie {
-				// http.StatusBadRequest
-				http.Redirect(w, r, "/", http.StatusSeeOther)
-				return
-			}
 			// http.StatusBadRequest
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
-		tokenString := cookie.Value
-		claims := &Claims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims,
-			func(t *jwt.Token) (interface{}, error) {
-				return key, nil
-			})
+		token, claims, err := ParseTokenString(cookie.Value)
 		if err != nil {
-			if err == jwt.ErrSignatureInvalid {
-				// http.StatusUnauthorized
-				http.Redirect(w, r, "/", http.StatusSeeOther)
-				return
-			}
 			// http.StatusBadRequest
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
-		if !token.Valid {
+		if token.Valid {
+			fmt.Println(roles, claims.Role)
+			for _, role := range roles {
+				if claims.Role == role {
+					HandlerFunc.ServeHTTP(w, r)
+				} else {
+					// http.StatusUnauthorized
+					http.Redirect(w, r, "/", http.StatusSeeOther)
+					return
+				}
+			}
+		} else {
 			// http.StatusUnauthorized
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
-		HandlerFunc.ServeHTTP(w, r)
 	}
 }
 
@@ -63,27 +45,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	} else {
-		// check credentials
-		credentials := &Credentials{
-			Username: r.FormValue("username"),
-			Password: r.FormValue("password"),
-		}
-		if models.GetPlayer(credentials.Username, credentials.Password) != "failed" {
-			// create a JWT
-			expirationTime := time.Now().Add(time.Minute * 5)
-			claims := &Claims{
-				Username: credentials.Username,
-				StandardClaims: jwt.StandardClaims{
-					ExpiresAt: expirationTime.Unix(),
-				},
-			}
-			token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-			tokenString, err := token.SignedString(key)
+		username := r.FormValue("username")
+		password := r.FormValue("password")
+		if models.GetPlayer(username, password) != "failed" {
+			tokenString, expirationTime, err := CreateToken(username, "user")
 			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
+				http.Redirect(w, r, "/", http.StatusSeeOther)
 				return
 			}
-			// return the JWT as a cookie
 			http.SetCookie(w,
 				&http.Cookie{
 					Name:    "token",
@@ -92,6 +61,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 				},
 			)
 			http.Redirect(w, r, "/scoreboard.html", http.StatusSeeOther)
+			return
 		} else {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
