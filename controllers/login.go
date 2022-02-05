@@ -47,7 +47,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	} else {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
-		if models.GetPlayer(username, password) != "failed" {
+		if models.AuthenticatePlayer(username, password) {
 			tokenString, expirationTime, err := CreateToken(username, "user")
 			if err != nil {
 				http.Redirect(w, r, "/", http.StatusSeeOther)

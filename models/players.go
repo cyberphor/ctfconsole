@@ -1,6 +1,9 @@
 package models
 
-import "database/sql"
+import (
+	"database/sql"
+	"fmt"
+)
 
 type PlayerData struct {
 	Username string
@@ -49,20 +52,20 @@ func GetPlayers() []PlayerData {
 	return Players
 }
 
-func GetPlayer(username string, password string) string {
+func AuthenticatePlayer(username string, password string) bool {
 	database, err := sql.Open("sqlite3", "store/store.db")
 	if err != nil {
 		panic(err)
 	}
-	statement := `SELECT username FROM players WHERE (username,password) = (?,?);`
+	statement := `SELECT id FROM players WHERE (username,password) = (?,?);`
+	fmt.Println(username)
 	row := database.QueryRow(statement, username, GetPasswordHash(password))
-	var PlayerUsername string
-	switch err := row.Scan(&PlayerUsername); err {
-	case nil:
-		return PlayerUsername
-	case sql.ErrNoRows:
-		return "failed"
-	default:
-		panic(err)
+	var id string
+	fmt.Print(row.Scan(&id))
+	err = row.Scan()
+	if err != nil {
+		return false
+	} else {
+		return true
 	}
 }
