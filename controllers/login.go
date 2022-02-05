@@ -1,13 +1,12 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/cyberphor/ctfconsole/models"
 )
 
-func Auth(roles []string, HandlerFunc http.HandlerFunc) http.HandlerFunc {
+func CheckAuthentication(roleRequired string, HandlerFunc http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("token")
 		if err != nil {
@@ -22,15 +21,13 @@ func Auth(roles []string, HandlerFunc http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 		if token.Valid {
-			fmt.Println(roles, claims.Role)
-			for _, role := range roles {
-				if claims.Role == role {
-					HandlerFunc.ServeHTTP(w, r)
-				} else {
-					// http.StatusUnauthorized
-					http.Redirect(w, r, "/", http.StatusSeeOther)
-					return
-				}
+			if claims.Role == roleRequired {
+				HandlerFunc.ServeHTTP(w, r)
+				return
+			} else {
+				// http.StatusUnauthorized
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+				return
 			}
 		} else {
 			// http.StatusUnauthorized

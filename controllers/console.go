@@ -19,6 +19,6 @@ func Console() {
 	http.HandleFunc("/login", Login)
 	http.HandleFunc("/register.html", RegisterPage)
 	http.HandleFunc("/register", Register)
-	http.HandleFunc("/scoreboard.html", Auth([]string{"admin", "user"}, Scoreboard))
+	http.HandleFunc("/scoreboard.html", CheckAuthentication("user", Scoreboard))
 	http.ListenAndServe(":8000", nil)
 }
