@@ -1,44 +1,10 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/cyberphor/ctfconsole/models"
 )
-
-func Auth(roles []string, HandlerFunc http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("token")
-		if err != nil {
-			// http.StatusBadRequest
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-		token, claims, err := ParseTokenString(cookie.Value)
-		if err != nil {
-			// http.StatusBadRequest
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-		if token.Valid {
-			fmt.Println(roles, claims.Role)
-			for _, role := range roles {
-				if claims.Role == role {
-					HandlerFunc.ServeHTTP(w, r)
-				} else {
-					// http.StatusUnauthorized
-					http.Redirect(w, r, "/", http.StatusSeeOther)
-					return
-				}
-			}
-		} else {
-			// http.StatusUnauthorized
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-			return
-		}
-	}
-}
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
@@ -47,7 +13,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	} else {
 		username := r.FormValue("username")
 		password := r.FormValue("password")
-		if models.AuthenticatePlayer(username, password) {
+		if models.AuthenticateUser(username, password) {
 			tokenString, expirationTime, err := CreateToken(username, "user")
 			if err != nil {
 				http.Redirect(w, r, "/", http.StatusSeeOther)

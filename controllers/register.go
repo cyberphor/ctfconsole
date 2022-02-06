@@ -11,7 +11,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	} else {
-		models.CreatePlayer(r.FormValue("username"), r.FormValue("password"), r.FormValue("team"))
+		models.CreateUser(r.FormValue("username"), r.FormValue("password"), r.FormValue("team"), "user")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}

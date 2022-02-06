@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -34,4 +35,28 @@ func ParseTokenString(tokenString string) (*jwt.Token, *Claims, error) {
 	})
 	claims := token.Claims.(*Claims)
 	return token, claims, err
+}
+
+func VerifyToken(HandlerFunc http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie, err := r.Cookie("token")
+		if err != nil {
+			// http.StatusBadRequest
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		token, _, err := ParseTokenString(cookie.Value)
+		if err != nil {
+			// http.StatusBadRequest
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		if token.Valid {
+			HandlerFunc.ServeHTTP(w, r)
+		} else {
+			// http.StatusUnauthorized
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+	}
 }

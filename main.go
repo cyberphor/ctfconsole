@@ -6,9 +6,7 @@ import (
 )
 
 func main() {
-	models.CreateTableForAdmins()
-	models.CreateTableForPlayers()
-	models.CreateAdmin("elliot", "bug")
-	models.CreatePlayer("victor", "password", "Blue Team")
+	models.CreateTableForUsers()
+	models.CreateTableForScoreboard()
 	controllers.Console()
 }
