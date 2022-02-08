@@ -19,6 +19,7 @@ func Console() {
 	http.HandleFunc("/login", Login)
 	http.HandleFunc("/register.html", RegisterPage)
 	http.HandleFunc("/register", Register)
+	http.HandleFunc("/challenges.html", VerifyToken(ScoreboardPage))
 	http.HandleFunc("/scoreboard.html", VerifyToken(ScoreboardPage))
 	http.HandleFunc("/admin/create-ctf.html", VerifyToken(CreateCtfPage))
 	http.ListenAndServe(":8000", nil)
