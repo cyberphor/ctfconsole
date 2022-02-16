@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"database/sql"
 	"encoding/hex"
-	"fmt"
 )
 
 type User struct {
@@ -24,7 +23,6 @@ func AuthenticateUser(username string, password string) bool {
 	var id string
 	switch err := row.Scan(&id); err {
 	case sql.ErrNoRows:
-		fmt.Println("false")
 		return false
 	case nil:
 		return true
