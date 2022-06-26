@@ -2,7 +2,7 @@
 ![GitHub](https://img.shields.io/github/license/cyberphor/ctfconsole)  
 ctfconsole is a Capture The Flag (CTF) server written Go. 
 
-![ctfconsole](https://github.com/cyberphor/ctfconsole/screenshot.png)  
+![ctfconsole](/screenshot.png)  
 
 ### Instructions
 **Step 1.** Download ctfconsole from GitHub.
