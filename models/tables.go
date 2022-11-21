@@ -1,6 +1,10 @@
 package models
 
-import "database/sql"
+import (
+	"database/sql"
+
+	_ "github.com/mattn/go-sqlite3"
+)
 
 func CreateTableForAdmins() {
 	database, err := sql.Open("sqlite3", "accounts.db")

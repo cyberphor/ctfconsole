@@ -21,5 +21,16 @@ go build .
 
 ![ctfconsole](/screenshot.png)  
 
+### Third-Party Packages
+```go
+go get github.com/golang-jwt/jwt
+go get github.com/mattn/go-sqlite3
+```
+
+### TODO
+- [ ] Update HTML filepaths
+- [ ] Simplify identity management (admins, users > principal)
+- [ ] Add GitHub Action to deploy binary as a Release
+
 ### Copyright
 This project is licensed under the terms of the [MIT license](/LICENSE).
