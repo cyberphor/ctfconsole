@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/cyberphor/ctfconsole/controllers"
 	"github.com/cyberphor/ctfconsole/models"
 )
 
@@ -42,13 +43,13 @@ func ScoreboardPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func Console() {
-	filePath := http.Dir("/")
+	filePath := http.Dir("views/")
 	fileServer := http.FileServer(filePath)
 	http.Handle("/static/", fileServer)
 	http.HandleFunc("/admin/index.html", AdminLoginPage)
 	http.HandleFunc("/index.html", LoginPage)
 	http.HandleFunc("/register.html", RegisterPage)
-	//http.HandleFunc("/login", Login)
+	http.HandleFunc("/login", controllers.Login)
 	//http.HandleFunc("/register", Register)
 	//http.HandleFunc("/admin/login", AdminLogin)
 	//http.HandleFunc("/challenges.html", VerifyToken(ScoreboardPage))

@@ -28,9 +28,17 @@ go get github.com/mattn/go-sqlite3
 ```
 
 ### TODO
-- [ ] Update HTML filepaths
+- [x] Update HTML filepaths
 - [ ] Simplify identity management (admins, users > principal)
 - [ ] Add GitHub Action to deploy binary as a Release
+
+### Filepaths
+- /views/pages.go (HTML Templates): `views/templates/*`
+- /views/pages.go (Root directory of HTTP server): `filePath := http.Dir("views/")`
+- /views/pages.go (Files HTTP server will serve): `http.Handle("/static/", fileServer)`
+- /views/templates/header.gohtml: `/static/bootstrap.css`
+- /views/static/bootstrap.css
+- /views/static/bootstrap.js
 
 ### Copyright
 This project is licensed under the terms of the [MIT license](/LICENSE).
