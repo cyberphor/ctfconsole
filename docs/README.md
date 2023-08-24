@@ -1,0 +1,29 @@
+## File Layout
+- main.go
+- go.mod
+- go.sum
+- static/
+  - css/
+    - styles.css
+  - js/
+    - script.js
+  - images/
+    - logo.png
+  - fonts/
+    - font.ttf
+- templates/
+  - layout.html
+  - home.html
+  - about.html
+- src/
+  - routes.go
+  - handlers.go
+  - models.go
+  - utils.go
+  - config.go
+- scripts/
+  - deploy.sh
+- docs/
+  - user-guide.md
+- tests/
+  - test_routes.go
