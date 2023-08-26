@@ -2,7 +2,13 @@ package admin
 
 import "github.com/gofiber/fiber/v2"
 
-func CreateAdmin(c *fiber.Ctx) error {
+type Admin struct {
+	Id       int    `json:"id"`
+	Name     string `json:"username"`
+	Password string `json:"password"`
+}
+
+func Create(c *fiber.Ctx) error {
 	return c.SendString("Creating an admin")
 }
 

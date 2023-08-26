@@ -5,18 +5,13 @@ ctfconsole is a Capture The Flag (CTF) server written in Go.
 ### Instructions
 **Step 1.** Download ctfconsole from GitHub.
 ```
-git clone https://github.com/cyberphor/ctfconsole
-```
-
-**Step 2.** Navigate to the repository downloaded and compile ctfconsole.
-```
+git clone https://github.com/cyberphor/ctfconsole &&\
 cd ctfconsole
-go build .
 ```
 
-**Step 3.** Start ctfconsole and browse to TCP port 8000 on your computer. 
+**Step 2.** Build and run the required containers using Docker Compose. 
 ```
-.\ctfconsole.exe
+docker compose up
 ```
 
 ![ctfconsole](/screenshot.png)  

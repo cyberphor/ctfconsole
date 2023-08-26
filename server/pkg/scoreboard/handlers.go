@@ -1,6 +1,15 @@
 package scoreboard
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/cyberphor/ctfconsole/pkg/team"
+	"github.com/gofiber/fiber/v2"
+)
+
+type Scoreboard struct {
+	Id    int         `json:"id"`
+	Name  string      `json:"scoreboard"`
+	Teams []team.Team `json:"teams"`
+}
 
 func Create(c *fiber.Ctx) error {
 	return c.SendString("Creating a scoreboard")

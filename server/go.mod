@@ -2,7 +2,10 @@ module github.com/cyberphor/ctfconsole
 
 go 1.17
 
-require github.com/gofiber/fiber/v2 v2.48.0
+require (
+	github.com/gofiber/fiber/v2 v2.48.0
+	github.com/mattn/go-sqlite3 v1.14.17
+)
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect

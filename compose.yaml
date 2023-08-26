@@ -1,0 +1,15 @@
+services:
+  ctfconsole:
+    build: .
+    image: ctfconsole:latest
+    container_name: ctfconsole
+    hostname: ctfconsole
+    env_file: .env
+    volumes:
+      - ctfconsole_logs:/var/log/ctfconsole/
+    ports:
+      - "${CTFCONSOLE_UI_PORT}:${CTFCONSOLE_UI_PORT}"
+
+volumes:
+  ctfconsole_logs:
+    name: ctfconsole_logs
