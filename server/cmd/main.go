@@ -20,5 +20,3 @@ func main() {
 	router.Set(app)
 	app.Listen(port)
 }
-
-// go build -o ctfconsole .

@@ -21,10 +21,9 @@ func CreateSQLiteDatabase(name string) {
 	queries = []string{
 		`CREATE TABLE IF NOT EXISTS admins (
 			id INTEGER PRIMARY KEY,
-			username  TEXT,
+			name  TEXT,
 			password  TEXT,
-			role      TEXT,
-			UNIQUE(username)
+			UNIQUE(name)
 		);`,
 		`CREATE TABLE IF NOT EXISTS challenges (
 			id INTEGER PRIMARY KEY,
@@ -35,9 +34,9 @@ func CreateSQLiteDatabase(name string) {
 		);`,
 		`CREATE TABLE IF NOT EXISTS players (
 			id INTEGER PRIMARY KEY,
-			username  TEXT,
+			name  TEXT,
 			password  TEXT,
-			UNIQUE(username)
+			UNIQUE(name)
 		);`,
 		`CREATE TABLE IF NOT EXISTS scoreboards (
 			id INTEGER PRIMARY KEY,
