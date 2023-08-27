@@ -19,6 +19,7 @@ func Create(c *fiber.Ctx) error {
 	var db *sql.DB
 	var query string
 	var statement *sql.Stmt
+	var response map[string]interface{}
 
 	player = new(Player)
 	c.BodyParser(player)
@@ -37,18 +38,20 @@ func Create(c *fiber.Ctx) error {
 		return c.Status(500).JSON(err)
 	}
 
+	response = make(fiber.Map)
 	_, err = statement.Exec(player.Name, player.Password)
 	if err != nil {
-		if sqlerror, ok := err.(*sqlite3.Error); ok {
+		if sqlerror, ok := err.(sqlite3.Error); ok {
 			if sqlerror.Code == sqlite3.ErrConstraint {
-				return c.Status(400).JSON(sqlerror.Code)
+				response["created"] = "false"
+				response["error"] = "player name already taken"
+				return c.Status(400).JSON(response)
 			}
-			return c.Status(400).JSON(sqlerror.Code)
 		}
-		c.Status(400).JSON(err)
 	}
 
-	return c.JSON(player.Name)
+	response["created"] = "true"
+	return c.JSON(response)
 }
 
 func Get(c *fiber.Ctx) error {
