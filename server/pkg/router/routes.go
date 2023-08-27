@@ -14,11 +14,10 @@ func Set(app *fiber.App) {
 	app.Get("/", func(c *fiber.Ctx) error { return c.SendString("Welcome") })
 
 	// player routes
-	app.Post("/api/v1/player/:name/:password", player.Create)
+	app.Post("/api/v1/player", player.Create)
 	app.Get("/api/v1/player", player.Get)
-	app.Get("/api/v1/player/:name", player.Get)
-	app.Put("/api/v1/player/:name", player.Get)
-	app.Delete("/api/v1/player/:username", player.Get)
+	app.Put("/api/v1/player", player.Update)
+	app.Delete("/api/v1/player", player.Delete)
 
 	// admin routes
 	app.Get("/api/v1/admin", admin.Get)

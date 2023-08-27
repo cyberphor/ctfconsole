@@ -7,9 +7,12 @@ services:
     env_file: .env
     volumes:
       - ctfconsole_logs:/var/log/ctfconsole/
+      - ctfconsole_db:/opt/ctfconsole/server/storage
     ports:
       - "${CTFCONSOLE_UI_PORT}:${CTFCONSOLE_UI_PORT}"
 
 volumes:
+  ctfconsole_db:
+    name: ctfconsole_db
   ctfconsole_logs:
     name: ctfconsole_logs

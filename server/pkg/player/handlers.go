@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/mattn/go-sqlite3"
 )
 
 type Player struct {
@@ -13,56 +14,61 @@ type Player struct {
 }
 
 func Create(c *fiber.Ctx) error {
-	var db *sql.DB
+	var player *Player
 	var err error
+	var db *sql.DB
 	var query string
 	var statement *sql.Stmt
-	var player Player
 
-	player = Player{
-		Name:     c.Params("name"),
-		Password: c.Params("password"),
-	}
-
-	db, err = sql.Open("sqlite3", "ctfconsole.db")
+	player = new(Player)
+	c.BodyParser(player)
 	if err != nil {
-		panic(err)
+		return c.Status(400).JSON(err)
 	}
 
-	query = `INSERT OR IGNORE INTO players (name, password) VALUES (?,?);`
+	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
+	if err != nil {
+		return c.Status(500).JSON(err)
+	}
+
+	query = `INSERT INTO players (name, password) VALUES (?,?);`
 	statement, err = db.Prepare(query)
 	if err != nil {
-		panic(err)
+		return c.Status(500).JSON(err)
 	}
 
-	statement.Exec(player.Name, player.Password)
+	_, err = statement.Exec(player.Name, player.Password)
 	if err != nil {
-		panic(err)
+		if sqlerror, ok := err.(*sqlite3.Error); ok {
+			if sqlerror.Code == sqlite3.ErrConstraint {
+				return c.Status(400).JSON(sqlerror.Code)
+			}
+			return c.Status(400).JSON(sqlerror.Code)
+		}
+		c.Status(400).JSON(err)
 	}
 
-	return c.JSON(player)
+	return c.JSON(player.Name)
 }
 
 func Get(c *fiber.Ctx) error {
 	var db *sql.DB
 	var err error
 	var rows *sql.Rows
-	var player Player
-	var players []Player
+	var player string
+	var players []string
 
-	db, err = sql.Open("sqlite3", "ctfconsole.db")
-	rows, err = db.Query(`SELECT id, name FROM players;`)
+	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
+	rows, err = db.Query(`SELECT name FROM players;`)
 	if err != nil {
 		panic(err)
 	}
 
 	for rows.Next() {
-		rows.Scan(&player.Id, &player.Name)
+		rows.Scan(&player)
 		players = append(players, player)
-		if err != nil {
-			return c.JSON(err)
-		}
 	}
+
 	return c.JSON(players)
 }
 

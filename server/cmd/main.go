@@ -15,8 +15,8 @@ func main() {
 	port = ":" + *flag.String("p", "80", "ctfconsole UI port")
 	flag.Parse()
 
-	storage.CreateSQLiteDatabase("ctfconsole.db")
 	app = fiber.New()
+	storage.CreateSQLiteDatabase("storage/ctfconsole.db")
 	router.Set(app)
 	app.Listen(port)
 }
