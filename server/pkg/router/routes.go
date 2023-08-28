@@ -5,14 +5,12 @@ import (
 	"github.com/cyberphor/ctfconsole/pkg/challenge"
 	"github.com/cyberphor/ctfconsole/pkg/player"
 	"github.com/cyberphor/ctfconsole/pkg/scoreboard"
+	"github.com/cyberphor/ctfconsole/pkg/store"
 	"github.com/cyberphor/ctfconsole/pkg/team"
 	"github.com/gofiber/fiber/v2"
 )
 
-func Set(app *fiber.App) {
-	// default route
-	app.Get("/", func(c *fiber.Ctx) error { return c.SendString("Welcome") })
-
+func Route(app *fiber.App, db *store.Store) {
 	// player routes
 	app.Post("/api/v1/player", player.Create)
 	app.Get("/api/v1/player", player.Get)
