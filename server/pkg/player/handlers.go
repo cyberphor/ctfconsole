@@ -8,77 +8,175 @@ import (
 )
 
 type Player struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Password string `json:"password"`
+	Id       *int    `json:"id,omitempty"`
+	Name     *string `json:"name,omitempty"`
+	Password *string `json:"password,omitempty"`
 }
 
 func Create(c *fiber.Ctx) error {
+	var message map[string]string
 	var player *Player
 	var err error
 	var db *sql.DB
 	var query string
 	var statement *sql.Stmt
-	var response map[string]interface{}
+	var sqlerror sqlite3.Error
+	var ok bool
 
+	message = make(map[string]string)
 	player = new(Player)
 	c.BodyParser(player)
 	if err != nil {
-		return c.Status(400).JSON(err)
+		message["data"] = err.Error()
+		return c.Status(400).JSON(message)
 	}
 
 	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
 	if err != nil {
-		return c.Status(500).JSON(err)
+		message["data"] = err.Error()
+		return c.Status(500).JSON(message)
 	}
 
 	query = `INSERT INTO players (name, password) VALUES (?,?);`
 	statement, err = db.Prepare(query)
 	if err != nil {
+		message["data"] = err.Error()
 		return c.Status(500).JSON(err)
 	}
 
-	response = make(fiber.Map)
 	_, err = statement.Exec(player.Name, player.Password)
 	if err != nil {
-		if sqlerror, ok := err.(sqlite3.Error); ok {
+		sqlerror, ok = err.(sqlite3.Error)
+		if ok {
 			if sqlerror.Code == sqlite3.ErrConstraint {
-				response["created"] = "false"
-				response["error"] = "player name already taken"
-				return c.Status(400).JSON(response)
+				message["data"] = "player name is already taken"
+				return c.Status(400).JSON(message)
 			}
+			message["data"] = err.Error()
+			return c.Status(400).JSON(message)
 		}
 	}
 
-	response["created"] = "true"
-	return c.JSON(response)
+	message["data"] = "created player"
+	return c.Status(200).JSON(message)
 }
 
 func Get(c *fiber.Ctx) error {
+	var message map[string][]Player
 	var db *sql.DB
 	var err error
 	var rows *sql.Rows
-	var player string
-	var players []string
+	var player Player
+	var players []Player
 
+	message = make(map[string][]Player)
 	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
-	rows, err = db.Query(`SELECT name FROM players;`)
 	if err != nil {
-		panic(err)
+		var message map[string]string
+		message["data"] = err.Error()
+		return c.Status(500).JSON(message)
+	}
+
+	rows, err = db.Query(`SELECT id, name FROM players;`)
+	if err != nil {
+		var message map[string]string
+		message["data"] = err.Error()
+		return c.Status(500).JSON(message)
 	}
 
 	for rows.Next() {
-		rows.Scan(&player)
+		rows.Scan(&player.Id, &player.Name)
 		players = append(players, player)
 	}
 
-	return c.JSON(players)
+	message["data"] = players
+	return c.Status(200).JSON(message)
 }
 
 func Update(c *fiber.Ctx) error {
-	return c.SendString("Updating a player")
+	var message map[string]string
+	var player *Player
+	var err error
+	var db *sql.DB
+	var query string
+	var statement *sql.Stmt
+	var sqlerror sqlite3.Error
+	var ok bool
+
+	message = make(map[string]string)
+	player = new(Player)
+	c.BodyParser(player)
+	if err != nil {
+		message["data"] = err.Error()
+		return c.Status(400).JSON(message)
+	}
+
+	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
+	if err != nil {
+		message["data"] = err.Error()
+		return c.Status(500).JSON(message)
+	}
+
+	query = `UPDATE players SET name = (?) WHERE id = (?);`
+	statement, err = db.Prepare(query)
+	if err != nil {
+		message["data"] = err.Error()
+		return c.Status(500).JSON(message)
+	}
+
+	_, err = statement.Exec(player.Name, player.Id)
+	if err != nil {
+		sqlerror, ok = err.(sqlite3.Error)
+		if ok {
+			message["data"] = sqlerror.Error()
+			return c.Status(400).JSON(message)
+		}
+	}
+
+	message["data"] = "updated player"
+	return c.Status(200).JSON(message)
 }
 
 func Delete(c *fiber.Ctx) error {
-	return c.SendString("Deleting a player")
+	var message map[string]string
+	var player *Player
+	var err error
+	var db *sql.DB
+	var query string
+	var statement *sql.Stmt
+	var ok bool
+	var sqlerror sqlite3.Error
+
+	message = make(map[string]string)
+	player = new(Player)
+	c.BodyParser(player)
+	if err != nil {
+		message["data"] = err.Error()
+		return c.Status(400).JSON(message)
+	}
+
+	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
+	if err != nil {
+		message["data"] = err.Error()
+		return c.Status(500).JSON(message)
+	}
+
+	query = `DELETE FROM players WHERE name = (?);`
+	statement, err = db.Prepare(query)
+	if err != nil {
+		message["data"] = err.Error()
+		return c.Status(500).JSON(err)
+	}
+
+	_, err = statement.Exec(player.Name)
+	if err != nil {
+		_, ok = err.(sqlite3.Error)
+		if ok {
+			message["data"] = sqlerror.Error()
+			return c.Status(400).JSON(message)
+		}
+	}
+
+	message["data"] = "deleted player"
+	return c.Status(200).JSON(message)
 }
