@@ -20,3 +20,7 @@ https://medium.com/@adhtanjung/how-to-build-rest-api-using-go-fiber-gorm-orm-and
 https://www.educative.io/answers/what-is-the-golang-function-newtype--startype
 
 https://go.dev/play/p/JJNa0m2_nw
+
+https://dev.to/0xbf/catch-error-when-using-sqlite-in-golang-58nn
+
+https://kenanbek.medium.com/golang-how-to-parse-yaml-file-31b78141bda7

@@ -10,15 +10,31 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type Health struct {
+	Status string
+}
+
+func (h Health) Get(c *fiber.Ctx) error {
+	var message map[string]string
+	message = make(map[string]string)
+	h.Status = "imok"
+	message["data"] = h.Status
+	return c.Status(200).JSON(message)
+}
+
 func Route(app *fiber.App, s *store.Store) {
 	var r fiber.Router
+	var health *Health
 	var ph *player.Handler
 
 	r = app.Group("/api/v1")
-
+	health = &Health{}
 	ph = &player.Handler{
 		Store: s,
 	}
+
+	// health routes
+	app.Get("/ruok", health.Get)
 
 	// player routes
 	r.Post("/player", ph.Create)
@@ -27,22 +43,18 @@ func Route(app *fiber.App, s *store.Store) {
 	r.Delete("/player", ph.Delete)
 
 	// admin routes
-	r.Get("/api/v1/admin", admin.Get)
-	r.Get("/api/v1/admin/:name", admin.Get)
-	r.Post("/api/v1/admin", admin.Update)
+	r.Get("/admin", admin.Get)
+	r.Post("/admin", admin.Update)
 
 	// team routes
-	r.Get("/api/v1/team", team.Get)
-	r.Get("/api/v1/team/:name", team.Get)
-	r.Post("/api/v1/team", team.Update)
+	r.Get("/team", team.Get)
+	r.Post("/team", team.Update)
 
 	// challenge routes
-	r.Get("/api/v1/challenge", challenge.Get)
-	r.Get("/api/v1/challenge/:name", challenge.Get)
-	r.Post("/api/v1/challenge", challenge.Update)
+	r.Get("/challenge", challenge.Get)
+	r.Post("/challenge", challenge.Update)
 
 	// scoreboard routes
-	r.Get("/api/v1/scoreboard", scoreboard.Get)
-	r.Get("/api/v1/scoreboard/{scoreboardId}", scoreboard.Get)
-	r.Post("/api/v1/scoreboard", scoreboard.Update)
+	r.Get("/scoreboard", scoreboard.Get)
+	r.Post("/scoreboard", scoreboard.Update)
 }

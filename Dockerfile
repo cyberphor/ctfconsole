@@ -20,4 +20,4 @@ COPY server/ .
 RUN go build -o /usr/local/bin/ctfconsole cmd/main.go
 
 # run ctfconsole
-CMD ["ctfconsole", "-p", "${CTFCONSOLE_UI_PORT}"]
+CMD ["ctfconsole", "-c", "config.yaml"]
