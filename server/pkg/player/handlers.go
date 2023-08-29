@@ -3,6 +3,7 @@ package player
 import (
 	"database/sql"
 
+	"github.com/cyberphor/ctfconsole/pkg/store"
 	"github.com/gofiber/fiber/v2"
 	"github.com/mattn/go-sqlite3"
 )
@@ -13,11 +14,14 @@ type Player struct {
 	Password *string `json:"password,omitempty"`
 }
 
-func Create(c *fiber.Ctx) error {
+type Handler struct {
+	Store *store.Store
+}
+
+func (h Handler) Create(c *fiber.Ctx) error {
 	var message map[string]string
 	var player *Player
 	var err error
-	var db *sql.DB
 	var query string
 	var statement *sql.Stmt
 	var sqlerror sqlite3.Error
@@ -31,14 +35,13 @@ func Create(c *fiber.Ctx) error {
 		return c.Status(400).JSON(message)
 	}
 
-	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
 	if err != nil {
 		message["data"] = err.Error()
 		return c.Status(500).JSON(message)
 	}
 
 	query = `INSERT INTO players (name, password) VALUES (?,?);`
-	statement, err = db.Prepare(query)
+	statement, err = h.Store.DB.Prepare(query)
 	if err != nil {
 		message["data"] = err.Error()
 		return c.Status(500).JSON(err)
@@ -61,23 +64,15 @@ func Create(c *fiber.Ctx) error {
 	return c.Status(200).JSON(message)
 }
 
-func Get(c *fiber.Ctx) error {
+func (h Handler) Get(c *fiber.Ctx) error {
 	var message map[string][]Player
-	var db *sql.DB
 	var err error
 	var rows *sql.Rows
 	var player Player
 	var players []Player
 
 	message = make(map[string][]Player)
-	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
-	if err != nil {
-		var message map[string]string
-		message["data"] = err.Error()
-		return c.Status(500).JSON(message)
-	}
-
-	rows, err = db.Query(`SELECT id, name FROM players;`)
+	rows, err = h.Store.DB.Query(`SELECT id, name FROM players;`)
 	if err != nil {
 		var message map[string]string
 		message["data"] = err.Error()
@@ -93,7 +88,7 @@ func Get(c *fiber.Ctx) error {
 	return c.Status(200).JSON(message)
 }
 
-func Update(c *fiber.Ctx) error {
+func (h Handler) Update(c *fiber.Ctx) error {
 	var message map[string]string
 	var player *Player
 	var err error
@@ -106,17 +101,6 @@ func Update(c *fiber.Ctx) error {
 	message = make(map[string]string)
 	player = new(Player)
 	c.BodyParser(player)
-	if err != nil {
-		message["data"] = err.Error()
-		return c.Status(400).JSON(message)
-	}
-
-	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
-	if err != nil {
-		message["data"] = err.Error()
-		return c.Status(500).JSON(message)
-	}
-
 	query = `UPDATE players SET name = (?) WHERE id = (?);`
 	statement, err = db.Prepare(query)
 	if err != nil {
@@ -137,11 +121,10 @@ func Update(c *fiber.Ctx) error {
 	return c.Status(200).JSON(message)
 }
 
-func Delete(c *fiber.Ctx) error {
+func (h Handler) Delete(c *fiber.Ctx) error {
 	var message map[string]string
 	var player *Player
 	var err error
-	var db *sql.DB
 	var query string
 	var statement *sql.Stmt
 	var ok bool
@@ -150,19 +133,8 @@ func Delete(c *fiber.Ctx) error {
 	message = make(map[string]string)
 	player = new(Player)
 	c.BodyParser(player)
-	if err != nil {
-		message["data"] = err.Error()
-		return c.Status(400).JSON(message)
-	}
-
-	db, err = sql.Open("sqlite3", "storage/ctfconsole.db")
-	if err != nil {
-		message["data"] = err.Error()
-		return c.Status(500).JSON(message)
-	}
-
 	query = `DELETE FROM players WHERE name = (?);`
-	statement, err = db.Prepare(query)
+	statement, err = h.Store.DB.Prepare(query)
 	if err != nil {
 		message["data"] = err.Error()
 		return c.Status(500).JSON(err)
