@@ -10,30 +10,39 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func Route(app *fiber.App, db *store.Store) {
+func Route(app *fiber.App, s *store.Store) {
+	var r fiber.Router
+	var ph *player.Handler
+
+	r = app.Group("/api/v1")
+
+	ph = &player.Handler{
+		Store: s,
+	}
+
 	// player routes
-	app.Post("/api/v1/player", player.Create)
-	app.Get("/api/v1/player", player.Get)
-	app.Put("/api/v1/player", player.Update)
-	app.Delete("/api/v1/player", player.Delete)
+	r.Post("/player", ph.Create)
+	r.Get("/player", ph.Get)
+	r.Put("/player", ph.Update)
+	r.Delete("/player", ph.Delete)
 
 	// admin routes
-	app.Get("/api/v1/admin", admin.Get)
-	app.Get("/api/v1/admin/:name", admin.Get)
-	app.Post("/api/v1/admin", admin.Update)
+	r.Get("/api/v1/admin", admin.Get)
+	r.Get("/api/v1/admin/:name", admin.Get)
+	r.Post("/api/v1/admin", admin.Update)
 
 	// team routes
-	app.Get("/api/v1/team", team.Get)
-	app.Get("/api/v1/team/:name", team.Get)
-	app.Post("/api/v1/team", team.Update)
+	r.Get("/api/v1/team", team.Get)
+	r.Get("/api/v1/team/:name", team.Get)
+	r.Post("/api/v1/team", team.Update)
 
 	// challenge routes
-	app.Get("/api/v1/challenge", challenge.Get)
-	app.Get("/api/v1/challenge/:name", challenge.Get)
-	app.Post("/api/v1/challenge", challenge.Update)
+	r.Get("/api/v1/challenge", challenge.Get)
+	r.Get("/api/v1/challenge/:name", challenge.Get)
+	r.Post("/api/v1/challenge", challenge.Update)
 
 	// scoreboard routes
-	app.Get("/api/v1/scoreboard", scoreboard.Get)
-	app.Get("/api/v1/scoreboard/{scoreboardId}", scoreboard.Get)
-	app.Post("/api/v1/scoreboard", scoreboard.Update)
+	r.Get("/api/v1/scoreboard", scoreboard.Get)
+	r.Get("/api/v1/scoreboard/{scoreboardId}", scoreboard.Get)
+	r.Post("/api/v1/scoreboard", scoreboard.Update)
 }
