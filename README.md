@@ -16,10 +16,5 @@ docker compose up
 
 ![ctfconsole](/screenshot.png)  
 
-### TODO
-- [x] Update HTML filepaths
-- [ ] Simplify identity management (admins, users > principal)
-- [ ] Add GitHub Action to deploy binary as a Release
-
 ### Copyright
 This project is licensed under the terms of the [MIT license](/LICENSE).
