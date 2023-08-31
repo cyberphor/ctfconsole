@@ -2,7 +2,9 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
+	"io"
+	"log/slog"
+	"os"
 
 	"github.com/cyberphor/ctfconsole/pkg/router"
 	"github.com/cyberphor/ctfconsole/pkg/store"
@@ -23,6 +25,7 @@ type Config struct {
 	StoreIP          string           `yaml:"storeIp"`
 	StorePort        string           `yaml:"storePort"`
 	StoreCredentials StoreCredentials `yaml:"storeCredentials"`
+	LogFilePath      string           `yaml:"logFilePath"`
 }
 
 func (c *Config) GetUiAddress() string {
@@ -33,6 +36,18 @@ func (c *Config) GetStoreAddress() string {
 	return c.StoreIP + ":" + c.StorePort
 }
 
+func Logger(logFilePath string) (*slog.Logger, error) {
+	var file *os.File
+	var err error
+	var writer io.Writer
+	var handler slog.Handler
+
+	file, err = os.Create(logFilePath)
+	writer = io.Writer(file)
+	handler = slog.NewJSONHandler(writer, nil)
+	return slog.New(handler), err
+}
+
 func main() {
 	var configFilePath string
 	var configFile []byte
@@ -40,13 +55,14 @@ func main() {
 	var config Config
 	var app *fiber.App
 	var db *store.Store
+	var logger *slog.Logger
 
 	// get config file path
 	configFilePath = *flag.String("c", "config.yaml", "Path to ctfconsole config")
 	flag.Parse()
 
 	// get config file
-	configFile, err = ioutil.ReadFile(configFilePath)
+	configFile, err = os.ReadFile(configFilePath)
 	if err != nil {
 		panic(err)
 	}
@@ -57,11 +73,18 @@ func main() {
 		panic(err)
 	}
 
+	// get logger
+	logger, err = Logger(config.LogFilePath)
+	if err != nil {
+		panic(err)
+	}
+	logger.Info("Started logger")
+
 	app = fiber.New()
 	db = store.New()
 	router.Route(app, db)
 	err = app.Listen(config.GetUiAddress())
 	if err != nil {
-		panic(err)
+		logger.Error(err.Error())
 	}
 }

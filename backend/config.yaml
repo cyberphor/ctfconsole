@@ -7,3 +7,4 @@ storePort: 5432
 storeCredentials:
   username: postgres
   password: postgres
+logFilePath: "/var/log/ctfconsole/ctfconsole.log"
