@@ -14,8 +14,8 @@ COPY package-lock.json .
 RUN npm install --silent
 RUN npm install react-scripts@3.4.1 -g --silent
 
-# copy ctfconsole frontend source code
-COPY . ./
+# copy source code
+COPY . .
 
 # start ctfconsole frontend
 CMD ["npm", "start"]

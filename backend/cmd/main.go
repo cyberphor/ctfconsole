@@ -9,6 +9,7 @@ import (
 	"github.com/cyberphor/ctfconsole/pkg/router"
 	"github.com/cyberphor/ctfconsole/pkg/store"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"gopkg.in/yaml.v3"
 )
 
@@ -18,8 +19,8 @@ type StoreCredentials struct {
 }
 
 type Config struct {
-	UiIp             string           `yaml:"uiIp"`
-	UiPort           string           `yaml:"uiPort"`
+	ApiIp            string           `yaml:"ApiIp"`
+	ApiPort          string           `yaml:"ApiPort"`
 	StoreDriver      string           `yaml:"storeDriver"`
 	StoreName        string           `yaml:"storeName"`
 	StoreIP          string           `yaml:"storeIp"`
@@ -28,8 +29,8 @@ type Config struct {
 	LogFilePath      string           `yaml:"logFilePath"`
 }
 
-func (c *Config) GetUiAddress() string {
-	return c.UiIp + ":" + c.UiPort
+func (c *Config) GetApiAddress() string {
+	return c.ApiIp + ":" + c.ApiPort
 }
 
 func (c *Config) GetStoreAddress() string {
@@ -81,9 +82,15 @@ func main() {
 	logger.Info("Started logger")
 
 	app = fiber.New()
+
+	// allow inbound requests to backend from frontend
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:3000",
+	}))
+
 	db = store.New()
 	router.Route(app, db)
-	err = app.Listen(config.GetUiAddress())
+	err = app.Listen(config.GetApiAddress())
 	if err != nil {
 		logger.Error(err.Error())
 	}
