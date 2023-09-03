@@ -1,5 +1,4 @@
 # Dockerfile metadata
-# Docker metadata
 FROM golang:alpine3.18
 LABEL version="v0.3.0"
 LABEL description="ctfconsole is a Capture The Flag (CTF) server"
@@ -11,12 +10,12 @@ RUN apk add build-base
 
 # download backend dependencies
 WORKDIR /opt/ctfconsole/backend
-COPY backend/go.mod .
-COPY backend/go.sum .
+COPY go.mod .
+COPY go.sum .
 RUN go mod download
 
 # copy and build source code
-COPY backend/ .
+COPY . .
 RUN go build -o /usr/local/bin/ctfconsole cmd/main.go
 
 # run ctfconsole

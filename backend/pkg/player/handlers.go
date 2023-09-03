@@ -5,7 +5,6 @@ import (
 
 	"github.com/cyberphor/ctfconsole/pkg/store"
 	"github.com/gofiber/fiber/v2"
-	"github.com/mattn/go-sqlite3"
 )
 
 type Player struct {
@@ -24,8 +23,6 @@ func (h Handler) Create(c *fiber.Ctx) error {
 	var err error
 	var query string
 	var statement *sql.Stmt
-	var sqlerror sqlite3.Error
-	var ok bool
 
 	message = make(map[string]string)
 	player = new(Player)
@@ -49,15 +46,8 @@ func (h Handler) Create(c *fiber.Ctx) error {
 
 	_, err = statement.Exec(player.Name, player.Password)
 	if err != nil {
-		sqlerror, ok = err.(sqlite3.Error)
-		if ok {
-			if sqlerror.Code == sqlite3.ErrConstraint {
-				message["data"] = "player name is already taken"
-				return c.Status(400).JSON(message)
-			}
-			message["data"] = err.Error()
-			return c.Status(400).JSON(message)
-		}
+		message["data"] = err.Error()
+		return c.Status(400).JSON(message)
 	}
 
 	message["data"] = "created player"
@@ -92,17 +82,14 @@ func (h Handler) Update(c *fiber.Ctx) error {
 	var message map[string]string
 	var player *Player
 	var err error
-	var db *sql.DB
 	var query string
 	var statement *sql.Stmt
-	var sqlerror sqlite3.Error
-	var ok bool
 
 	message = make(map[string]string)
 	player = new(Player)
 	c.BodyParser(player)
 	query = `UPDATE players SET name = (?) WHERE id = (?);`
-	statement, err = db.Prepare(query)
+	statement, err = h.Store.DB.Prepare(query)
 	if err != nil {
 		message["data"] = err.Error()
 		return c.Status(500).JSON(message)
@@ -110,11 +97,8 @@ func (h Handler) Update(c *fiber.Ctx) error {
 
 	_, err = statement.Exec(player.Name, player.Id)
 	if err != nil {
-		sqlerror, ok = err.(sqlite3.Error)
-		if ok {
-			message["data"] = sqlerror.Error()
-			return c.Status(400).JSON(message)
-		}
+		message["data"] = err.Error()
+		return c.Status(400).JSON(message)
 	}
 
 	message["data"] = "updated player"
@@ -127,8 +111,6 @@ func (h Handler) Delete(c *fiber.Ctx) error {
 	var err error
 	var query string
 	var statement *sql.Stmt
-	var ok bool
-	var sqlerror sqlite3.Error
 
 	message = make(map[string]string)
 	player = new(Player)
@@ -142,11 +124,8 @@ func (h Handler) Delete(c *fiber.Ctx) error {
 
 	_, err = statement.Exec(player.Name)
 	if err != nil {
-		_, ok = err.(sqlite3.Error)
-		if ok {
-			message["data"] = sqlerror.Error()
-			return c.Status(400).JSON(message)
-		}
+		message["data"] = err.Error()
+		return c.Status(400).JSON(message)
 	}
 
 	message["data"] = "deleted player"

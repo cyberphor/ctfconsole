@@ -1,15 +1,29 @@
 services:
-  ctfconsole:
-    build: .
-    image: ctfconsole:latest
-    container_name: ctfconsole
-    hostname: ctfconsole
+  ctfconsole_backend:
+    profiles: ["ctfconsole", "backend"]
+    build: backend
+    image: ctfconsole_backend:latest
+    container_name: ctfconsole_backend
+    hostname: ctfconsole_backend
     env_file: .env
     volumes:
       - ctfconsole_logs:/var/log/ctfconsole/
       - ctfconsole_db:/opt/ctfconsole/backend/storage
     ports:
-      - "${CTFCONSOLE_UI_PORT}:${CTFCONSOLE_UI_PORT}"
+      #- "${BACKEND_API_PORT}:${BACKEND_API_PORT}"
+      - "9001:9001"
+  ctfconsole_frontend:
+    profiles: ["ctfconsole", "frontend"]
+    build: frontend
+    image: ctfconsole_frontend:latest
+    container_name: ctfconsole_frontend
+    hostname: ctfconsole_frontend
+    env_file: .env
+    volumes:
+      - ctfconsole_logs:/var/log/ctfconsole/
+      - ctfconsole_db:/opt/ctfconsole/backend/storage
+    ports:
+      - "${FRONTEND_UI_PORT}:${FRONTEND_UI_PORT}"
 
 volumes:
   ctfconsole_db:

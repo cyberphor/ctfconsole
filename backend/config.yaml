@@ -1,5 +1,5 @@
 uiIp: 
-uiPort: 80
+uiPort: 9001
 storeDriver: sqlite3
 storeName: ctfconsole
 storeIp: localhost
