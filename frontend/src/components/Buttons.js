@@ -6,7 +6,7 @@ export default function ButtonGetPlayers() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://localhost:9001/api/v1/player');
+      const response = await fetch('http://localhost:8443/api/v1/player');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }

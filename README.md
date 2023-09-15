@@ -11,8 +11,10 @@ cd ctfconsole
 
 **Step 2.** Build and run the required containers using Docker Compose. 
 ```
-docker compose up
+docker compose up --profile "ctfconsole" up
 ```
+
+**Step 3.** Open a browser to `http://localhost:443`.
 
 ![ctfconsole](/screenshot.png)  
 

@@ -1,5 +1,7 @@
-apiIp:
-apiPort: 9001
+uiIp: localhost
+ui: 443
+apiIp: localhost
+apiPort: 8443
 storeDriver: sqlite3
 storeName: ctfconsole
 storeIp: localhost

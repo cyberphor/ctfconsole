@@ -18,5 +18,5 @@ RUN go mod download
 COPY . .
 RUN go build -o /usr/local/bin/ctfconsole cmd/main.go
 
-# run ctfconsole
+# start ctfconsole backend
 CMD ["ctfconsole", "-c", "config.yaml"]

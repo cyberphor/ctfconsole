@@ -1,15 +1,16 @@
 services:
   ctfconsole_frontend:
     profiles: 
-    - "ctfconsole"
-    - "frontend"
+      - "ctfconsole"
+      - "frontend"
     build: frontend
     image: ctfconsole_frontend:latest
     container_name: ctfconsole_frontend
     hostname: ctfconsole_frontend
-    env_file: .env
+    environment:
+      - PORT=${CTFCONSOLE_UI_PORT}
     ports:
-      - "${CTFCONSOLE_FRONTEND_PORT}:${CTFCONSOLE_FRONTEND_PORT}"
+      - ${CTFCONSOLE_UI_PORT}:${CTFCONSOLE_UI_PORT}
   ctfconsole_backend:
     profiles: 
     - "ctfconsole"
@@ -18,12 +19,13 @@ services:
     image: ctfconsole_backend:latest
     container_name: ctfconsole_backend
     hostname: ctfconsole_backend
-    env_file: .env
+    environment:
+      - PORT=${CTFCONSOLE_API_PORT}
     volumes:
       - ctfconsole_logs:/var/log/ctfconsole/
       - ctfconsole_db:/opt/ctfconsole/backend/storage
     ports:
-      - "${CTFCONSOLE_BACKEND_PORT}:${CTFCONSOLE_BACKEND_PORT}"
+      - "${CTFCONSOLE_API_PORT}:${CTFCONSOLE_API_PORT}"
 
 volumes:
   ctfconsole_db:

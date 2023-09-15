@@ -19,6 +19,8 @@ type StoreCredentials struct {
 }
 
 type Config struct {
+	uiIp             string           `yaml:"uiIp"`
+	uiPort           string           `yaml:"uiPort"`
 	ApiIp            string           `yaml:"ApiIp"`
 	ApiPort          string           `yaml:"ApiPort"`
 	StoreDriver      string           `yaml:"storeDriver"`
@@ -27,6 +29,10 @@ type Config struct {
 	StorePort        string           `yaml:"storePort"`
 	StoreCredentials StoreCredentials `yaml:"storeCredentials"`
 	LogFilePath      string           `yaml:"logFilePath"`
+}
+
+func (c *Config) GetUiAddress() string {
+	return "http://" + c.uiIp + ":" + c.uiPort
 }
 
 func (c *Config) GetApiAddress() string {
@@ -84,9 +90,7 @@ func main() {
 	app = fiber.New()
 
 	// allow inbound requests to backend from frontend
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:3000",
-	}))
+	app.Use(cors.New(cors.Config{AllowOrigins: config.GetUiAddress()}))
 
 	db = store.New()
 	router.Route(app, db)
