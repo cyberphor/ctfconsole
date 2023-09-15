@@ -5,42 +5,16 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"strconv"
 
 	"github.com/cyberphor/ctfconsole/pkg/router"
 	"github.com/cyberphor/ctfconsole/pkg/store"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"gopkg.in/yaml.v3"
 )
 
-type StoreCredentials struct {
-	Username string `yaml:"username"`
-	Password string `yaml:"password"`
-}
-
-type Config struct {
-	uiIp             string           `yaml:"uiIp"`
-	uiPort           string           `yaml:"uiPort"`
-	ApiIp            string           `yaml:"ApiIp"`
-	ApiPort          string           `yaml:"ApiPort"`
-	StoreDriver      string           `yaml:"storeDriver"`
-	StoreName        string           `yaml:"storeName"`
-	StoreIP          string           `yaml:"storeIp"`
-	StorePort        string           `yaml:"storePort"`
-	StoreCredentials StoreCredentials `yaml:"storeCredentials"`
-	LogFilePath      string           `yaml:"logFilePath"`
-}
-
-func (c *Config) GetUiAddress() string {
-	return "http://" + c.uiIp + ":" + c.uiPort
-}
-
-func (c *Config) GetApiAddress() string {
-	return c.ApiIp + ":" + c.ApiPort
-}
-
-func (c *Config) GetStoreAddress() string {
-	return c.StoreIP + ":" + c.StorePort
+func GetAddress(ip string, port int) string {
+	return "http://" + ip + ":" + strconv.Itoa(port)
 }
 
 func Logger(logFilePath string) (*slog.Logger, error) {
@@ -56,32 +30,26 @@ func Logger(logFilePath string) (*slog.Logger, error) {
 }
 
 func main() {
-	var configFilePath string
-	var configFile []byte
+	var uiIp string
+	var uiPort int
+	var apiIp string
+	var apiPort int
+	var apiLogPath string
 	var err error
-	var config Config
 	var app *fiber.App
 	var db *store.Store
 	var logger *slog.Logger
 
-	// get config file path
-	configFilePath = *flag.String("c", "config.yaml", "Path to ctfconsole config")
+	// get configuration arguments
+	uiIp = *flag.String("ui-ip", "localhost", "UI IP Address")
+	uiPort = *flag.Int("ui-port", 443, "UI Port")
+	apiIp = *flag.String("api-ip", "localhost", "API IP Address")
+	apiPort = *flag.Int("api-port", 8443, "API Port")
+	apiLogPath = *flag.String("log-path", "/var/log/ctfconsole/ctfconsole.log", "Log file path")
 	flag.Parse()
 
-	// get config file
-	configFile, err = os.ReadFile(configFilePath)
-	if err != nil {
-		panic(err)
-	}
-
-	// get config
-	err = yaml.Unmarshal(configFile, &config)
-	if err != nil {
-		panic(err)
-	}
-
 	// get logger
-	logger, err = Logger(config.LogFilePath)
+	logger, err = Logger(apiLogPath)
 	if err != nil {
 		panic(err)
 	}
@@ -90,11 +58,10 @@ func main() {
 	app = fiber.New()
 
 	// allow inbound requests to backend from frontend
-	app.Use(cors.New(cors.Config{AllowOrigins: config.GetUiAddress()}))
-
+	app.Use(cors.New(cors.Config{AllowOrigins: GetAddress(uiIp, uiPort)}))
 	db = store.New()
 	router.Route(app, db)
-	err = app.Listen(config.GetApiAddress())
+	err = app.Listen(GetAddress(apiIp, apiPort))
 	if err != nil {
 		logger.Error(err.Error())
 	}

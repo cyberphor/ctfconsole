@@ -19,8 +19,6 @@ services:
     image: ctfconsole_backend:latest
     container_name: ctfconsole_backend
     hostname: ctfconsole_backend
-    environment:
-      - PORT=${CTFCONSOLE_API_PORT}
     volumes:
       - ctfconsole_logs:/var/log/ctfconsole/
       - ctfconsole_db:/opt/ctfconsole/backend/storage

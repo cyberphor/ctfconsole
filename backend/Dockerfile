@@ -1,7 +1,7 @@
 # Dockerfile metadata
 FROM golang:alpine3.18
 LABEL version="v0.3.0"
-LABEL description="ctfconsole is a Capture The Flag (CTF) server"
+LABEL description="ctfconsole | a Capture the Flag (CTF) server"
 LABEL maintainer="Victor Fernandez III, @cyberphor"
 
 # download GCC (required by backend package: go-sqlite3)
@@ -19,4 +19,9 @@ COPY . .
 RUN go build -o /usr/local/bin/ctfconsole cmd/main.go
 
 # start ctfconsole backend
-CMD ["ctfconsole", "-c", "config.yaml"]
+CMD ctfconsole \
+  --ui-ip $CTFCONSOLE_UI_IP_ADDRESS \
+  --ui-port $CTFCONSOLE_UI_PORT \
+  --api-ip $CTFCONSOLE_API_IP_ADDRESS \
+  --api-port $CTFCONSOLE_API_PORT \
+  --log-path "${CTFCONSOLE_API_LOG_PATH}"
