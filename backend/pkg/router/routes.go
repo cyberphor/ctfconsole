@@ -11,51 +11,56 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type Health struct {
-	Status string
+type apiHealth struct {
+	Status string `default:"imok"`
 }
 
-func (h Health) Get(c *fiber.Ctx) error {
+func (api apiHealth) Get(c *fiber.Ctx) error {
 	var message map[string]string
+
 	message = make(map[string]string)
-	h.Status = "imok"
-	message["data"] = h.Status
+	message["data"] = api.Status
 	return c.Status(200).JSON(message)
 }
 
 func Route(app *fiber.App, db *sql.DB) {
 	var r fiber.Router
-	var health *Health
+	var api *apiHealth
 	var ph *player.Handler
 
+	// summarize route prefixes
 	r = app.Group("/api/v1")
-	health = &Health{}
+
+	// get health handler
+	api = &apiHealth{}
+
+	// get player handler
 	ph = &player.Handler{
 		DB: db,
 	}
 
-	// health routes
-	app.Get("/ruok", health.Get)
+	// set routes for api health data
+	app.Get("/ruok", api.Get)
 
-	// player routes
+	// set routes for player data
 	r.Post("/player", ph.Create)
 	r.Get("/player", ph.Get)
 	r.Put("/player", ph.Update)
 	r.Delete("/player", ph.Delete)
 
-	// admin routes
+	// set routes for admin data
 	r.Get("/admin", admin.Get)
 	r.Post("/admin", admin.Update)
 
-	// team routes
+	// set routes for team data
 	r.Get("/team", team.Get)
 	r.Post("/team", team.Update)
 
-	// challenge routes
+	// set routes for challenge data
 	r.Get("/challenge", challenge.Get)
 	r.Post("/challenge", challenge.Update)
 
-	// scoreboard routes
+	// set routes for scoreboard data
 	r.Get("/scoreboard", scoreboard.Get)
 	r.Post("/scoreboard", scoreboard.Update)
 }

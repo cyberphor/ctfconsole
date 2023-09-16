@@ -22,19 +22,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
-      retries: 5
-  ctfconsole_frontend:
-    profiles: 
-      - ctfconsole
-      - ctfconsole_ui
-    build: frontend
-    image: ctfconsole_ui:latest
-    container_name: ctfconsole_ui
-    hostname: ctfconsole_ui
-    environment:
-      - PORT=${CTFCONSOLE_UI_PORT}
-    ports:
-      - ${CTFCONSOLE_UI_PORT}:${CTFCONSOLE_UI_PORT}
+      retries: 3
   ctfconsole_backend:
     profiles: 
       - ctfconsole
@@ -48,6 +36,21 @@ services:
       - ctfconsole_db:/opt/ctfconsole/database
     ports:
       - ${CTFCONSOLE_API_PORT}:${CTFCONSOLE_API_PORT}
+    depends_on:
+      ctfconsole_db:
+        condition: service_healthy
+  ctfconsole_frontend:
+    profiles: 
+      - ctfconsole
+      - ctfconsole_ui
+    build: frontend
+    image: ctfconsole_ui:latest
+    container_name: ctfconsole_ui
+    hostname: ctfconsole_ui
+    environment:
+      - PORT=${CTFCONSOLE_UI_PORT}
+    ports:
+      - ${CTFCONSOLE_UI_PORT}:${CTFCONSOLE_UI_PORT}
 
 volumes:
   ctfconsole_db:
