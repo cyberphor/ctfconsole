@@ -75,7 +75,7 @@ func main() {
 	app = fiber.New()
 	app.Use(cors.New(cors.Config{AllowOrigins: GetURL("http", uiIp, uiPort)}))
 
-	//
+	// get database connection
 	dataSourceName = GetDataSourceName("postgres", dbUsername, dbPassword, dbIp, dbPort, dbName)
 	db, err = sql.Open("postgres", dataSourceName)
 	if err != nil {
