@@ -1,11 +1,12 @@
 package router
 
 import (
+	"database/sql"
+
 	"github.com/cyberphor/ctfconsole/pkg/admin"
 	"github.com/cyberphor/ctfconsole/pkg/challenge"
 	"github.com/cyberphor/ctfconsole/pkg/player"
 	"github.com/cyberphor/ctfconsole/pkg/scoreboard"
-	"github.com/cyberphor/ctfconsole/pkg/store"
 	"github.com/cyberphor/ctfconsole/pkg/team"
 	"github.com/gofiber/fiber/v2"
 )
@@ -22,7 +23,7 @@ func (h Health) Get(c *fiber.Ctx) error {
 	return c.Status(200).JSON(message)
 }
 
-func Route(app *fiber.App, s *store.Store) {
+func Route(app *fiber.App, db *sql.DB) {
 	var r fiber.Router
 	var health *Health
 	var ph *player.Handler
@@ -30,7 +31,7 @@ func Route(app *fiber.App, s *store.Store) {
 	r = app.Group("/api/v1")
 	health = &Health{}
 	ph = &player.Handler{
-		Store: s,
+		DB: db,
 	}
 
 	// health routes

@@ -20,8 +20,13 @@ RUN go build -o /usr/local/bin/ctfconsole cmd/main.go
 
 # start ctfconsole backend
 CMD ctfconsole \
+  --log-path "${CTFCONSOLE_API_LOG_PATH}" \
   --ui-ip $CTFCONSOLE_UI_IP_ADDRESS \
   --ui-port $CTFCONSOLE_UI_PORT \
   --api-ip $CTFCONSOLE_API_IP_ADDRESS \
   --api-port $CTFCONSOLE_API_PORT \
-  --log-path "${CTFCONSOLE_API_LOG_PATH}"
+  --db-ip $CTFCONSOLE_DB_ADDRESS \
+  --db-port $CTFCONSOLE_DB_PORT \
+  --db-name $CTFCONSOLE_DB_NAME \
+  --db-user $CTFCONSOLE_DB_USER \ 
+  --db-password $CTFCONSOLE_DB_USER_PASSWORD 

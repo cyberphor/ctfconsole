@@ -3,7 +3,6 @@ package player
 import (
 	"database/sql"
 
-	"github.com/cyberphor/ctfconsole/pkg/store"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -14,7 +13,7 @@ type Player struct {
 }
 
 type Handler struct {
-	Store *store.Store
+	DB *sql.DB
 }
 
 func (h Handler) Create(c *fiber.Ctx) error {
@@ -38,7 +37,7 @@ func (h Handler) Create(c *fiber.Ctx) error {
 	}
 
 	query = `INSERT INTO players (name, password) VALUES (?,?);`
-	statement, err = h.Store.DB.Prepare(query)
+	statement, err = h.DB.Prepare(query)
 	if err != nil {
 		message["data"] = err.Error()
 		return c.Status(500).JSON(err)
@@ -62,7 +61,7 @@ func (h Handler) Get(c *fiber.Ctx) error {
 	var players []Player
 
 	message = make(map[string][]Player)
-	rows, err = h.Store.DB.Query(`SELECT id, name FROM players;`)
+	rows, err = h.DB.Query(`SELECT id, name FROM players;`)
 	if err != nil {
 		var message map[string]string
 		message["data"] = err.Error()
@@ -89,7 +88,7 @@ func (h Handler) Update(c *fiber.Ctx) error {
 	player = new(Player)
 	c.BodyParser(player)
 	query = `UPDATE players SET name = (?) WHERE id = (?);`
-	statement, err = h.Store.DB.Prepare(query)
+	statement, err = h.DB.Prepare(query)
 	if err != nil {
 		message["data"] = err.Error()
 		return c.Status(500).JSON(message)
@@ -116,7 +115,7 @@ func (h Handler) Delete(c *fiber.Ctx) error {
 	player = new(Player)
 	c.BodyParser(player)
 	query = `DELETE FROM players WHERE name = (?);`
-	statement, err = h.Store.DB.Prepare(query)
+	statement, err = h.DB.Prepare(query)
 	if err != nil {
 		message["data"] = err.Error()
 		return c.Status(500).JSON(err)
