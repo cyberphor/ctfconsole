@@ -29,4 +29,4 @@ CMD ctfconsole \
   --db-port $CTFCONSOLE_DB_PORT \
   --db-name $CTFCONSOLE_DB_NAME \
   --db-user $CTFCONSOLE_DB_USER \ 
-  --db-password $CTFCONSOLE_DB_USER_PASSWORD 
+  --db-password $CTFCONSOLE_DB_PASSWORD 
