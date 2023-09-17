@@ -12,18 +12,19 @@ services:
     environment:
       - POSTGRES_DB=${CTFCONSOLE_DB_NAME}
       - POSTGRES_USER=${CTFCONSOLE_DB_USER}
-      - POSTGRES_PASSWORD=${CTFCONSOLE_DB_USER_PASSWORD}
+      - POSTGRES_PASSWORD=${CTFCONSOLE_DB_PASSWORD}
     volumes:
       - ctfconsole_logs:/var/log/ctfconsole/
       - ctfconsole_db:/opt/ctfconsole/database
     ports:
       - ${CTFCONSOLE_DB_PORT}:${CTFCONSOLE_DB_PORT}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -d ${CTFCONSOLE_DB_NAME} -U ${CTFCONSOLE_DB_USER}"]
+      start_period: 5s
+      timeout: 3s
+      retries: 2
       interval: 5s
-      timeout: 5s
-      retries: 3
-  ctfconsole_backend:
+  ctfconsole_api:
     profiles: 
       - ctfconsole
       - ctfconsole_api
@@ -31,6 +32,8 @@ services:
     image: ctfconsole_api:latest
     container_name: ctfconsole_api
     hostname: ctfconsole_api
+    env_file:
+      - .env
     volumes:
       - ctfconsole_logs:/var/log/ctfconsole/
       - ctfconsole_db:/opt/ctfconsole/database
@@ -39,7 +42,12 @@ services:
     depends_on:
       ctfconsole_db:
         condition: service_healthy
-  ctfconsole_frontend:
+  # healthcheck:
+  #   test: ["CMD", "curl", "-f", "CTFCONSOLE_API_HEALTHCHECK_ENDPOINT"]
+  #   timeout: 3s
+  #   retries: 2
+  #   interval: 10s
+  ctfconsole_ui:
     profiles: 
       - ctfconsole
       - ctfconsole_ui
@@ -49,8 +57,14 @@ services:
     hostname: ctfconsole_ui
     environment:
       - PORT=${CTFCONSOLE_UI_PORT}
+    volumes:
+      - ./frontend/src:/opt/ctfconsole/src
+      - ./frontend/public:/opt/ctfconsole/public
     ports:
       - ${CTFCONSOLE_UI_PORT}:${CTFCONSOLE_UI_PORT}
+  # depends_on:
+  #   ctfconsole_api:
+  #     condition: service_healthy
 
 volumes:
   ctfconsole_db:

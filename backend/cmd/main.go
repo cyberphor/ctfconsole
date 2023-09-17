@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	"io"
 	"log/slog"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"github.com/cyberphor/ctfconsole/pkg/router"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	_ "github.com/lib/pq"
 )
 
 type Config struct {
@@ -83,19 +85,24 @@ func main() {
 	// get api logger
 	logger, err = Logger(config.APILogPath)
 	if err != nil {
+		fmt.Println(err.Error())
 		panic(err)
 	}
+	fmt.Println("Started logger")
 	logger.Info("Started logger")
 
 	// configure api to accept inbound requests from ui
 	app = fiber.New()
 	app.Use(cors.New(cors.Config{AllowOrigins: config.GetUIEndpoint()}))
+	fmt.Println("Configured API")
 
 	// get db connection
 	db, err = sql.Open("postgres", config.GetDBEndpoint())
 	if err != nil {
+		fmt.Println(err.Error())
 		logger.Error(err.Error())
 	}
+	fmt.Println("Connected to DB")
 
 	// wire api to db
 	router.Route(app, db)

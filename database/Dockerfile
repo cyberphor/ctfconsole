@@ -1,5 +1,5 @@
 # Dockerfile metadata
-FROM postgres:12
+FROM postgres:16
 LABEL version="v0.3.0"
 LABEL description="ctfconsole | a Capture the Flag (CTF) server"
 LABEL maintainer="Victor Fernandez III, @cyberphor"

@@ -4,8 +4,7 @@ go 1.17
 
 require (
 	github.com/gofiber/fiber/v2 v2.48.0
-	github.com/mattn/go-sqlite3 v1.14.17
-	gopkg.in/yaml.v3 v3.0.1
+	github.com/lib/pq v1.10.9
 )
 
 require (

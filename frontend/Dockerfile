@@ -5,8 +5,8 @@ LABEL description="ctfconsole | a Capture the Flag (CTF) server"
 LABEL maintainer="Victor Fernandez III, @cyberphor"
 
 # add `/app/node_modules/.bin` to $PATH
-WORKDIR /opt/ctfconsole/frontend
-ENV PATH /opt/ctfconsole/frontend/node_modules/.bin:$PATH
+WORKDIR /opt/ctfconsole/
+ENV PATH /opt/ctfconsole/node_modules/.bin:$PATH
 
 # install dependencies
 COPY package.json .
@@ -18,4 +18,4 @@ RUN npm install react-scripts@3.4.1 -g --silent
 COPY . .
 
 # start ctfconsole frontend
-CMD ["npm", "start"]
+CMD [ "npm", "start" ]
