@@ -1,21 +1,20 @@
 services:
-  ctfconsole_db:
+  database:
     profiles: 
     - ctfconsole
-    - ctfconsole_db
+    - ctfconsole_database
     build: database
-    image: ctfconsole_db:latest
-    container_name: ctfconsole_db
-    hostname: ctfconsole_db
+    image: ctfconsole_database:latest
+    container_name: ctfconsole_database
     env_file:
       - .env
     environment:
       - POSTGRES_DB=${CTFCONSOLE_DB_NAME}
       - POSTGRES_USER=${CTFCONSOLE_DB_USER}
       - POSTGRES_PASSWORD=${CTFCONSOLE_DB_PASSWORD}
+      - POSTGRES_INITDB_WALDIR=${CTFCONSOLE_DB_LOG_PATH}
     volumes:
-      - ctfconsole_logs:/var/log/ctfconsole/
-      - ctfconsole_db:/opt/ctfconsole/database
+      - ctfconsole_data:${CTFCONSOLE_DB_LOG_PATH}
     ports:
       - ${CTFCONSOLE_DB_PORT}:${CTFCONSOLE_DB_PORT}
     healthcheck:
@@ -24,37 +23,32 @@ services:
       timeout: 3s
       retries: 2
       interval: 5s
-  ctfconsole_api:
+  backend:
     profiles: 
       - ctfconsole
-      - ctfconsole_api
+      - ctfconsole_backend
     build: backend
-    image: ctfconsole_api:latest
-    container_name: ctfconsole_api
-    hostname: ctfconsole_api
+    image: ctfconsole_backend:latest
+    container_name: ctfconsole_backend
     env_file:
       - .env
     volumes:
-      - ctfconsole_logs:/var/log/ctfconsole/
-      - ctfconsole_db:/opt/ctfconsole/database
+      - ctfconsole_data:/var/log/ctfconsole/
+      - ctfconsole_data:/opt/ctfconsole/database
     ports:
       - ${CTFCONSOLE_API_PORT}:${CTFCONSOLE_API_PORT}
     depends_on:
-      ctfconsole_db:
+      database:
         condition: service_healthy
-  #  healthcheck:
-  #    test: [ "CMD", "curl", "-f", "CTFCONSOLE_API_HEALTH_ENDPOINT || exit 1" ]
-  #    timeout: 3s
-  #    retries: 2
-  #    interval: 10s
-  ctfconsole_ui:
+  frontend:
     profiles: 
       - ctfconsole
-      - ctfconsole_ui
+      - ctfconsole_frontend
     build: frontend
-    image: ctfconsole_ui:latest
-    container_name: ctfconsole_ui
-    hostname: ctfconsole_ui
+    image: ctfconsole_frontend:latest
+    container_name: ctfconsole_frontend
+    env_file:
+      - .env
     environment:
       - PORT=${CTFCONSOLE_UI_PORT}
     volumes:
@@ -62,12 +56,7 @@ services:
       - ./frontend/public:/opt/ctfconsole/public
     ports:
       - ${CTFCONSOLE_UI_PORT}:${CTFCONSOLE_UI_PORT}
-    #depends_on:
-    #  ctfconsole_api:
-    #    condition: service_healthy
 
 volumes:
-  ctfconsole_db:
-    name: ctfconsole_db
-  ctfconsole_logs:
-    name: ctfconsole_logs
+  ctfconsole_data:
+    name: ctfconsole_data

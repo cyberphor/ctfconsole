@@ -1,10 +1,10 @@
 # Dockerfile metadata
 FROM node:13.12.0-alpine
-LABEL version="v0.3.0"
+LABEL version="v0.1.0"
 LABEL description="ctfconsole | a Capture the Flag (CTF) server"
 LABEL maintainer="Victor Fernandez III, @cyberphor"
 
-# add `/app/node_modules/.bin` to $PATH
+# add "/app/node_modules/.bin" to $PATH
 WORKDIR /opt/ctfconsole/
 ENV PATH /opt/ctfconsole/node_modules/.bin:$PATH
 

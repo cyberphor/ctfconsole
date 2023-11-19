@@ -14,7 +14,10 @@ cd ctfconsole
 docker compose up --profile "ctfconsole" up
 ```
 
-**Step 3.** Open a browser to `http://localhost:443`.
+**Step 3.** Once you see a message similar to the one below, open a browser to `http://localhost`.
+```
+ctfconsole_frontend  | You can now view ctfconsole in the browser.
+```
 
 ![ctfconsole](/screenshot.png)  
 

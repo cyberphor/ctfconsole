@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"io"
@@ -8,6 +9,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/cyberphor/ctfconsole/pkg/router"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	_ "github.com/lib/pq"
@@ -51,19 +53,6 @@ func Logger(logFilePath string) (*slog.Logger, error) {
 	writer = io.Writer(file)
 	handler = slog.NewJSONHandler(writer, nil)
 	return slog.New(handler), err
-}
-
-type Health struct {
-	Status string `default:"imok"`
-}
-
-func (h Health) Get(c *fiber.Ctx) error {
-	var message map[string]string
-
-	message = make(map[string]string)
-	message["data"] = h.Status
-	fmt.Println(message)
-	return c.Status(200).JSON(message)
 }
 
 func getEnvStr(key string) (string, error) {
@@ -129,6 +118,7 @@ func main() {
 	var err error
 	var logger *slog.Logger
 	var app *fiber.App
+	var db *sql.DB
 
 	// get config
 	config, err = GetConfig()
@@ -150,54 +140,19 @@ func main() {
 	app.Use(cors.New(cors.Config{AllowOrigins: "*"}))
 
 	// get db connection
-	//db, err = sql.Open("postgres", config.GetDBEndpoint())
-	//if err != nil {
-	//	fmt.Println(err.Error())
-	//	logger.Error(err.Error())
-	//}
+	db, err = sql.Open("postgres", config.GetDBEndpoint())
+	if err != nil {
+		fmt.Println(err.Error())
+		logger.Error(err.Error())
+	}
+	fmt.Println("Connected to DB")
 
 	// wire api to db
-
-	var health *Health
-	//var ph *player.Handler
-
-	// get health handler
-	health = &Health{}
-
-	// get player handler
-	//ph = &player.Handler{
-	//	DB: db,
-	//}
-
-	// set routes for api health data
-	app.Get("/api/v1/ruok", health.Get)
-
-	// // set routes for player data
-	// app.Post("/api/v1/player", ph.Create)
-	// app.Get("/api/v1/player", ph.Get)
-	// app.Put("/api/v1/player", ph.Update)
-	// app.Delete("/api/v1/player", ph.Delete)
-	//
-	// // set routes for admin data
-	// app.Get("/api/v1/admin", admin.Get)
-	// app.Post("/api/v1/admin", admin.Update)
-	//
-	// // set routes for team data
-	// app.Get("/team", team.Get)
-	// app.Post("/team", team.Update)
-	//
-	// // set routes for challenge data
-	// app.Get("/challenge", challenge.Get)
-	// app.Post("/challenge", challenge.Update)
-	//
-	// // set routes for scoreboard data
-	// app.Get("/scoreboard", scoreboard.Get)
-	// app.Post("/scoreboard", scoreboard.Update)
-
-	err = app.Listen("127.0.0.1:8443")
+	router.Route(app, db)
+	err = app.Listen(config.GetAPIEndpoint())
 	if err != nil {
 		fmt.Println(err.Error())
 		panic(err)
-		// logger.Error(err.Error())
+		logger.Error(err.Error())
 	}
 }
