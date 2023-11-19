@@ -138,9 +138,6 @@ func main() {
 	// get api
 	app = fiber.New()
 
-	//configure api to use api logger
-	app.Use(logger)
-
 	// configure api to accept inbound requests from ui
 	app.Use(cors.New(cors.Config{AllowOrigins: "*"}))
 
