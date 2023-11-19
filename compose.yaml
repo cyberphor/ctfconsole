@@ -4,7 +4,7 @@ services:
     - ctfconsole
     - ctfconsole_database
     build: database
-    image: ctfconsole_database:latest
+    image: ctfconsole_database:${VERSION}
     container_name: ctfconsole_database
     env_file:
       - .env
@@ -28,7 +28,7 @@ services:
       - ctfconsole
       - ctfconsole_backend
     build: backend
-    image: ctfconsole_backend:latest
+    image: ctfconsole_backend:${VERSION}
     container_name: ctfconsole_backend
     env_file:
       - .env
@@ -45,7 +45,7 @@ services:
       - ctfconsole
       - ctfconsole_frontend
     build: frontend
-    image: ctfconsole_frontend:latest
+    image: ctfconsole_frontend:${VERSION}
     container_name: ctfconsole_frontend
     env_file:
       - .env

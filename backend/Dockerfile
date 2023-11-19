@@ -1,6 +1,6 @@
 # Dockerfile metadata
 FROM golang:alpine3.18
-LABEL version="v0.1.0"
+LABEL version="${VERSION}"
 LABEL description="ctfconsole | a Capture the Flag (CTF) server"
 LABEL maintainer="Victor Fernandez III, @cyberphor"
 
