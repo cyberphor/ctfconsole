@@ -1,3 +1,13 @@
+package config
+
+import (
+	"database/sql"
+	"fmt"
+	"io"
+	"log/slog"
+	"os"
+	"strconv"
+)
 
 type Config struct {
 	UIProtocol  string
@@ -94,4 +104,14 @@ func GetConfig() (Config, error) {
 	config.DBPort, err = getEnvInt("CTFCONSOLE_DB_PORT")
 
 	return config, err
+}
+
+func GetDatabaseConnection() (*sql.DB, error) {
+	dbUsername := os.Getenv("CTFCONSOLE_DB_USER")
+	dbPassword := os.Getenv("CTFCONSOLE_DB_PASSWORD")
+	dbAddress := os.Getenv("CTFCONSOLE_DB_IP_ADDRESS")
+	dbName := os.Getenv("CTFCONSOLE_DB_NAME")
+	dbConnection := fmt.Sprintf("postgresql://%s:%s@%s/%s?sslmode=disable", dbUsername, dbPassword, dbAddress, dbName)
+	db, err := sql.Open("postgres", dbConnection)
+	return db, err
 }

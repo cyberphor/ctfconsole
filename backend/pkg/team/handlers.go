@@ -1,14 +1,12 @@
 package team
 
 import (
-	"github.com/cyberphor/ctfconsole/pkg/player"
 	"github.com/gofiber/fiber/v2"
 )
 
 type Team struct {
-	Id      int             `json:"id"`
-	Name    string          `json:"team"`
-	Players []player.Player `json:"players"`
+	Id   int    `json:"id"`
+	Name string `json:"team"`
 }
 
 func Create(c *fiber.Ctx) error {

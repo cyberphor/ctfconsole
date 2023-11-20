@@ -28,9 +28,6 @@ func main() {
 
 	// wire player handlers to player endpoint
 	v1.Post("/player", player.Create)
-	v1.Get("/player", player.Get)
-	v1.Put("/player", player.Update)
-	v1.Delete("/player", player.Delete)
 
 	// wire admin handler to admin endpoint
 	v1.Get("/admin", admin.Get)
