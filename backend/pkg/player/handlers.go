@@ -15,27 +15,35 @@ func Post(c *fiber.Ctx) error {
 	// parse POST request
 	player := new(Player)
 	if err := c.BodyParser(player); err != nil {
-		return c.Status(400).JSON("Request parsing failed")
+		return c.Status(500).JSON(fiber.Map{
+			"Error": err.Error(),
+		})
 	}
 
 	// connect to database
 	db, err := config.DatabaseConnection()
 	if err != nil {
 		// return Internal Server Error
-		return c.Status(500).JSON(err)
+		return c.Status(500).JSON(fiber.Map{
+			"Error": err.Error(),
+		})
 	}
 
 	// prepare SQL statement
 	query := `INSERT INTO players (name, password) VALUES (?,?);`
 	statement, err := db.Prepare(query)
 	if err != nil {
-		return c.Status(500).JSON("Insert failed")
+		return c.Status(500).JSON(fiber.Map{
+			"Error": err.Error(),
+		})
 	}
 
 	// execute SQL statement
 	_, err = statement.Exec(player.Name, player.Password)
 	if err != nil {
-		return c.Status(400).JSON(err)
+		return c.Status(500).JSON(fiber.Map{
+			"Error": err.Error(),
+		})
 	}
 	return c.Status(200).JSON("Created player")
 }
