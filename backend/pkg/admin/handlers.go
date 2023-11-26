@@ -8,7 +8,7 @@ type Admin struct {
 	Password string `json:"password"`
 }
 
-func Create(c *fiber.Ctx) error {
+func Post(c *fiber.Ctx) error {
 	return c.SendString("Creating an admin")
 }
 
@@ -16,7 +16,7 @@ func Get(c *fiber.Ctx) error {
 	return c.SendString("Getting an admin")
 }
 
-func Update(c *fiber.Ctx) error {
+func Put(c *fiber.Ctx) error {
 	return c.SendString("Updating an admin")
 }
 

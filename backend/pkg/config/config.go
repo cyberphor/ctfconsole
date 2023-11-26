@@ -3,115 +3,80 @@ package config
 import (
 	"database/sql"
 	"fmt"
-	"io"
-	"log/slog"
 	"os"
 	"strconv"
 )
 
 type Config struct {
-	UIProtocol  string
-	UIIP        string
-	UIPort      int
-	APIProtocol string
-	APIIP       string
-	APIPort     int
-	APILogPath  string
-	DBProtocol  string
-	DBIP        string
-	DBPort      int
-	DBUsername  string
-	DBPassword  string
-	DBName      string
+	Port    int
+	LogPath string
 }
 
-func (c Config) GetUIEndpoint() string {
-	return c.UIProtocol + "://" + c.UIIP + ":" + strconv.Itoa(c.UIPort)
-}
-
-func (c Config) GetAPIEndpoint() string {
-	return c.APIIP + ":" + strconv.Itoa(c.APIPort)
-}
-
-func (c Config) GetDBEndpoint() string {
-	return c.DBProtocol + "://" + c.DBUsername + ":" + c.DBPassword + "@" + c.DBIP + "/" + c.DBName + "?sslmode=disable"
-}
-
-func Logger(logFilePath string) (*slog.Logger, error) {
-	var file *os.File
-	var err error
-	var writer io.Writer
-	var handler slog.Handler
-
-	file, err = os.Create(logFilePath)
-	writer = io.Writer(file)
-	handler = slog.NewJSONHandler(writer, nil)
-	return slog.New(handler), err
-}
-
-func getEnvStr(key string) (string, error) {
-	var valueStr string
-	var defined bool
-
-	valueStr, defined = os.LookupEnv(key)
-	if !defined {
-		return valueStr, fmt.Errorf("%s is not defined", key)
-	}
-
-	return valueStr, nil
-}
-
-func getEnvInt(key string) (int, error) {
-	var valueStr string
-	var valueInt int
-	var defined bool
-	var err error
-
-	valueStr, defined = os.LookupEnv(key)
-	if !defined {
-		return 0, fmt.Errorf("%s is not defined", key)
-	}
-
-	valueInt, err = strconv.Atoi(valueStr)
-	if err != nil {
-		return 0, fmt.Errorf("%s is not an integer", key)
-	}
-
-	return valueInt, nil
-}
-
-func GetConfig() (Config, error) {
+func Get() (Config, error) {
 	var config Config
+	var defined bool
 	var err error
+	var logpath string
+	var port string
 
-	// get ui parameters
-	config.UIProtocol, err = getEnvStr("CTFCONSOLE_UI_PROTOCOL")
-	config.UIIP, err = getEnvStr("CTFCONSOLE_UI_IP_ADDRESS")
-	config.UIPort, err = getEnvInt("CTFCONSOLE_UI_PORT")
+	// get API port
+	port, defined = os.LookupEnv("CTFCONSOLE_API_PORT")
+	if !defined {
+		return config, fmt.Errorf("'CTFCONSOLE_API_PORT' is not defined")
+	}
 
-	// get api parameters
-	config.APILogPath, err = getEnvStr("CTFCONSOLE_API_LOG_PATH")
-	config.APIProtocol, err = getEnvStr("CTFCONSOLE_API_PROTOCOL")
-	config.APIIP, err = getEnvStr("CTFCONSOLE_API_IP_ADDRESS")
-	config.APIPort, err = getEnvInt("CTFCONSOLE_API_PORT")
+	// convert API port value to an int
+	config.Port, err = strconv.Atoi(port)
+	if err != nil {
+		return config, err
+	}
 
-	// get db parameters
-	config.DBName, err = getEnvStr("CTFCONSOLE_DB_NAME")
-	config.DBUsername, err = getEnvStr("CTFCONSOLE_DB_USER")
-	config.DBPassword, err = getEnvStr("CTFCONSOLE_DB_PASSWORD")
-	config.DBProtocol, err = getEnvStr("CTFCONSOLE_DB_PROTOCOL")
-	config.DBIP, err = getEnvStr("CTFCONSOLE_DB_IP_ADDRESS")
-	config.DBPort, err = getEnvInt("CTFCONSOLE_DB_PORT")
+	// get API logpath value
+	logpath, defined = os.LookupEnv("CTFCONSOLE_LOG_PATH")
+	if !defined {
+		return config, fmt.Errorf("'CTFCONSOLE_LOG_PATH' is not defined")
+	}
+	config.LogPath = logpath
 
-	return config, err
+	// return config
+	return config, nil
 }
 
-func GetDatabaseConnection() (*sql.DB, error) {
-	dbUsername := os.Getenv("CTFCONSOLE_DB_USER")
-	dbPassword := os.Getenv("CTFCONSOLE_DB_PASSWORD")
-	dbAddress := os.Getenv("CTFCONSOLE_DB_IP_ADDRESS")
-	dbName := os.Getenv("CTFCONSOLE_DB_NAME")
-	dbConnection := fmt.Sprintf("postgresql://%s:%s@%s/%s?sslmode=disable", dbUsername, dbPassword, dbAddress, dbName)
-	db, err := sql.Open("postgres", dbConnection)
+func DatabaseConnection() (*sql.DB, error) {
+	username, defined := os.LookupEnv("CTFCONSOLE_DB_USERNAME")
+	if !defined {
+		return nil, fmt.Errorf("'CTFCONSOLE_DB_USERNAME' is not defined")
+	}
+
+	password, defined := os.LookupEnv("CTFCONSOLE_DB_PASSWORD")
+	if !defined {
+		return nil, fmt.Errorf("'CTFCONSOLE_DB_PASSWORD' is not defined")
+	}
+
+	address, defined := os.LookupEnv("CTFCONSOLE_DB_ADDRESS")
+	if !defined {
+		return nil, fmt.Errorf("'CTFCONSOLE_DB_ADDRESS' is not defined")
+	}
+
+	name, defined := os.LookupEnv("CTFCONSOLE_DB_NAME")
+	if !defined {
+		return nil, fmt.Errorf("'CTFCONSOLE_DB_NAME' is not defined")
+	}
+
+	connection := fmt.Sprintf(
+		"postgresql://%s:%s@%s/%s?sslmode=disable",
+		username,
+		password,
+		address,
+		name,
+	)
+	db, err := sql.Open("postgres", connection)
+	if err != nil {
+		return nil, err
+	}
+	err = db.Ping()
+	if err != nil {
+		return db, err
+	}
 	return db, err
 }

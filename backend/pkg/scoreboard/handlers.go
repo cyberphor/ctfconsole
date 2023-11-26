@@ -11,7 +11,7 @@ type Scoreboard struct {
 	Teams []team.Team `json:"teams"`
 }
 
-func Create(c *fiber.Ctx) error {
+func Post(c *fiber.Ctx) error {
 	return c.SendString("Creating a scoreboard")
 }
 
@@ -19,7 +19,7 @@ func Get(c *fiber.Ctx) error {
 	return c.SendString("Getting a scoreboard")
 }
 
-func Update(c *fiber.Ctx) error {
+func Put(c *fiber.Ctx) error {
 	return c.SendString("Updating a scoreboard")
 }
 
