@@ -1,7 +1,7 @@
 package player
 
 import (
-	"github.com/cyberphor/ctfconsole/pkg/config"
+	"github.com/cyberphor/ctfconsole/pkg/database"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -21,7 +21,7 @@ func Post(c *fiber.Ctx) error {
 	}
 
 	// connect to database
-	db, err := config.DatabaseConnection()
+	db, err := database.Connect()
 	if err != nil {
 		// return Internal Server Error
 		return c.Status(500).JSON(fiber.Map{
