@@ -17,6 +17,8 @@ services:
       - ctfconsole_data:${CTFCONSOLE_DB_LOG_PATH}
     ports:
       - ${CTFCONSOLE_DB_PORT}:${CTFCONSOLE_DB_PORT}
+    networks:
+      - ctfconsole
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d ${CTFCONSOLE_DB_NAME} -U ${CTFCONSOLE_DB_USER}" ]
       start_period: 5s
@@ -60,3 +62,6 @@ services:
 volumes:
   ctfconsole_data:
     name: ctfconsole_data
+
+networks:
+  ctfconsole:

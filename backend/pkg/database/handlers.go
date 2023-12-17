@@ -39,11 +39,11 @@ func Connect() (*sql.DB, error) {
 
 	// get db connection string
 	dataSourceName := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host,
-		port,
+		"postgresql://%s:%s@%s:%s/%s?sslmode=disable",
 		user,
 		password,
+		host,
+		port,
 		name,
 	)
 
