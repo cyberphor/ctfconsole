@@ -30,7 +30,7 @@ func Post(c *fiber.Ctx) error {
 	}
 
 	// prepare SQL statement
-	query := `INSERT INTO players (name, password) VALUES (?,?);`
+	query := `INSERT INTO players (name, password) VALUES ($1, $2);`
 	statement, err := db.Prepare(query)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

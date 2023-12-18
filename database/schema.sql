@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS challenges (
 );
 
 CREATE TABLE IF NOT EXISTS players (
-	id INTEGER PRIMARY KEY,
+	id SERIAL PRIMARY KEY,
 	name  TEXT,
 	password  TEXT,
 	UNIQUE(name)
