@@ -39,19 +39,50 @@ func Post(c *fiber.Ctx) error {
 	}
 
 	// execute SQL statement
-	_, err = statement.Exec(player.Name, player.Password)
+	result, err := statement.Exec(player.Name, player.Password)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"Error": err.Error(),
 		})
 	}
-	return c.Status(200).JSON("Created player")
+	return c.Status(200).JSON(result)
 }
 
 func Get(c *fiber.Ctx) error {
-	p := new(Player)
-	c.BodyParser(p)
-	return c.Status(200).JSON(p)
+	// parse GET request
+	player := new(Player)
+	if err := c.BodyParser(player); err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"Error": err.Error(),
+		})
+	}
+
+	// connect to database
+	db, err := database.Connect()
+	if err != nil {
+		// return Internal Server Error
+		return c.Status(500).JSON(fiber.Map{
+			"Error": err.Error(),
+		})
+	}
+
+	// prepare SQL statement
+	query := `SELECT * FROM players WHERE name = ($1);`
+	statement, err := db.Prepare(query)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"Error": err.Error(),
+		})
+	}
+
+	// execute SQL statement
+	result, err := statement.Exec(player.Name)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"Error": err.Error(),
+		})
+	}
+	return c.Status(200).JSON(result)
 }
 
 func Put(c *fiber.Ctx) error {

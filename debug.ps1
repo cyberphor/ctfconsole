@@ -24,5 +24,6 @@ func Start-Database {
 }
 
 func Test-API {
-    curl -s -X POST -H "Content-Type: application/json" -d '{"Name": "foo", "Password": "bar"}' localhost:8081/api/v1/player | jq
+    Invoke-RestMethod -Uri "http://localhost:8081/api/v1/player" -Method POST -Headers @{"Content-Type"="application/json"} -Body (@{Name="foo"; Password="bar"} | ConvertTo-JSON)
+    Invoke-RestMethod -Uri "http://localhost:8081/api/v1/player" -Method GET -Headers @{"Content-Type"="application/json"} -Body (@{Name="foo"} | ConvertTo-JSON)
 }
