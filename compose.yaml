@@ -1,11 +1,11 @@
 services:
-  database:
+  postgres:
     profiles: 
     - ctfconsole
-    - ctfconsole_database
-    build: database
-    image: ctfconsole_database:${VERSION}
-    container_name: ctfconsole_database
+    - postgres
+    build: postgres
+    image: postgres:${VERSION}
+    container_name: postgres
     hostname: ${POSTGRES_HOST}
     env_file:
       - .env
@@ -14,7 +14,7 @@ services:
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     networks:
-      - ctfconsole_database
+      - postgres
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}" ]
       start_period: 5s
@@ -37,7 +37,7 @@ services:
     ports:
       - ${CTFCONSOLE_API_PORT}:${CTFCONSOLE_API_PORT}
     networks:
-      - ctfconsole_database
+      - postgres
       - ctfconsole_frontend
     depends_on:
       database:
@@ -67,5 +67,5 @@ volumes:
     name: ctfconsole_data
 
 networks:
-  ctfconsole_database:
+  postgres:
   ctfconsole_frontend:
