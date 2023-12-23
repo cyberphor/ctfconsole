@@ -6,16 +6,19 @@ erDiagram
         id INTEGER
         name TEXT
     }
+
     Players {
         id SERIAL
         name TEXT
         password TEXT
         team INT
     }
+
     Campaigns {
         id SERIAL
         name TEXT
     }
+
     Challenges {
         id SERIAL
         name TEXT
@@ -24,12 +27,7 @@ erDiagram
         team INT
         solution TEXT
     }
-    Scoreboards {
-        id SERIAL
-        name TEXT
-        team INT
-        score INT
-    }
+
     Admins {
         id SERIAL
         name TEXT
@@ -39,6 +37,5 @@ erDiagram
     Team ||--o{ Players : "team_id"
     Campaigns ||--o{ Challenges : "campaign_id"
     Team ||--o{ Challenges : "team_id"
-    Team ||--o{ Scoreboards : "team_id"
     Team ||--o{ Admins : "team_id"
 ```
