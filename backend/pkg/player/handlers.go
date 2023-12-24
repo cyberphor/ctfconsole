@@ -16,16 +16,15 @@ func Post(c *fiber.Ctx) error {
 	player := new(Player)
 	if err := c.BodyParser(player); err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"Error": err.Error(),
+			"Error": "",
 		})
 	}
 
 	// connect to database
 	db, err := database.Connect()
 	if err != nil {
-		// return Internal Server Error
 		return c.Status(500).JSON(fiber.Map{
-			"Error": err.Error(),
+			"Error": "",
 		})
 	}
 
@@ -34,7 +33,7 @@ func Post(c *fiber.Ctx) error {
 	statement, err := db.Prepare(query)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"Error": err.Error(),
+			"Error": "",
 		})
 	}
 
@@ -42,7 +41,7 @@ func Post(c *fiber.Ctx) error {
 	result, err := statement.Exec(player.Name, player.Password)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"Error": err.Error(),
+			"Error": "",
 		})
 	}
 	return c.Status(200).JSON(result)
@@ -53,16 +52,15 @@ func Get(c *fiber.Ctx) error {
 	player := new(Player)
 	if err := c.BodyParser(player); err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"Error": err.Error(),
+			"Error": "",
 		})
 	}
 
 	// connect to database
 	db, err := database.Connect()
 	if err != nil {
-		// return Internal Server Error
 		return c.Status(500).JSON(fiber.Map{
-			"Error": err.Error(),
+			"Error": "",
 		})
 	}
 
@@ -71,7 +69,7 @@ func Get(c *fiber.Ctx) error {
 	statement, err := db.Prepare(query)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"Error": err.Error(),
+			"Error": "",
 		})
 	}
 
@@ -79,7 +77,7 @@ func Get(c *fiber.Ctx) error {
 	result, err := statement.Exec(player.Name)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
-			"Error": err.Error(),
+			"Error": "",
 		})
 	}
 	return c.Status(200).JSON(result)

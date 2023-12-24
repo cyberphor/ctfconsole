@@ -1,7 +1,7 @@
 func Set-Environment {
     # frontend settings
     $env:CTFCONSOLE_UI_IP_ADDRESS="localhost"
-    $env:CTFCONSOLE_UI_PORT=80
+    $env:PORT=80
     $env:CTFCONSOLE_UI_PROTOCOL="http"
 
     # backend settings

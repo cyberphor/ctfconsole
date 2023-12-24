@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ctfconsole_data:${POSTGRES_LOG_PATH}
+      - logs:/var/log/postgresql/
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     networks:
@@ -32,8 +32,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ctfconsole_data:/var/log/ctfconsole/
-      - ctfconsole_data:/opt/ctfconsole/database
+      - logs:/var/log/ctfconsole/
+      - data:/opt/ctfconsole/database
     ports:
       - ${CTFCONSOLE_API_PORT}:${CTFCONSOLE_API_PORT}
     networks:
@@ -52,19 +52,17 @@ services:
     hostname: ${CTFCONSOLE_UI_HOST}
     env_file:
       - .env
-    environment:
-      - PORT=${CTFCONSOLE_UI_PORT}
     volumes:
       - ./frontend/src:/opt/ctfconsole/src
       - ./frontend/public:/opt/ctfconsole/public
     ports:
-      - ${CTFCONSOLE_UI_PORT}:${CTFCONSOLE_UI_PORT}
+      - ${PORT}:${PORT}
     networks:
       - ctfconsole_frontend
 
 volumes:
-  ctfconsole_data:
-    name: ctfconsole_data
+  logs:
+  data:
 
 networks:
   postgres:

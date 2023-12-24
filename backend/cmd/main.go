@@ -13,23 +13,20 @@ import (
 	"github.com/cyberphor/ctfconsole/pkg/team"
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/lib/pq"
+	slogfiber "github.com/samber/slog-fiber"
 )
 
 // health, admin, campaign, challenge, team, player
 
 func main() {
+	// get logger
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	// get app
 	app := fiber.New()
 
-	// get app logpath
-	logpath, defined := os.LookupEnv("CTFCONSOLE_API_LOG_PATH")
-	if !defined {
-		logger.Error("CTFCONSOLE_API_LOG_PATH is not defined")
-		os.Exit(1)
-	}
-	fmt.Println(fmt.Sprintf("Logpath: %s", logpath))
+	// set app log settings
+	app.Use(slogfiber.New(logger))
 
 	// get app router
 	router := app.Group("/api/v1")
