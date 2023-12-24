@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS admins (
 	UNIQUE(name)
 );
 
+INSERT INTO admins (name, password) VALUES (0, "admin", "ctfconsole");
+
 CREATE TABLE IF NOT EXISTS campaigns (
     id SERIAL PRIMARY KEY,
 	name      TEXT,

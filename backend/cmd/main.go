@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 
 	"github.com/cyberphor/ctfconsole/pkg/admin"
@@ -18,13 +18,16 @@ import (
 // health, admin, campaign, challenge, team, player
 
 func main() {
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
 	// get app
 	app := fiber.New()
 
 	// get app logpath
 	logpath, defined := os.LookupEnv("CTFCONSOLE_API_LOG_PATH")
 	if !defined {
-		log.Fatal("CTFCONSOLE_API_LOG_PATH is not defined")
+		logger.Error("CTFCONSOLE_API_LOG_PATH is not defined")
+		os.Exit(1)
 	}
 	fmt.Println(fmt.Sprintf("Logpath: %s", logpath))
 
@@ -67,13 +70,15 @@ func main() {
 	// get app address
 	port, defined := os.LookupEnv("CTFCONSOLE_API_PORT")
 	if !defined {
-		log.Fatal("CTFCONSOLE_API_PORT is not defined")
+		logger.Error("CTFCONSOLE_API_PORT is not defined")
+		os.Exit(1)
 	}
 	address := fmt.Sprintf(":%s", port)
 
 	// start app
 	err := app.Listen(address)
 	if err != nil {
-		log.Fatal(err.Error())
+		logger.Error(err.Error())
+		os.Exit(1)
 	}
 }

@@ -40,7 +40,7 @@ services:
       - postgres
       - ctfconsole_frontend
     depends_on:
-      database:
+      postgres:
         condition: service_healthy
   frontend:
     profiles: 
