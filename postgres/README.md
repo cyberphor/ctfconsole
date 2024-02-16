@@ -3,39 +3,25 @@
 ```mermaid
 erDiagram
     Team {
-        id INTEGER
-        name TEXT
+        teamId INTEGER
+        teamName TEXT
     }
 
     Players {
-        id SERIAL
-        name TEXT
+        playerId SERIAL
+        playerName TEXT
         password TEXT
-        team INT
-    }
-
-    Campaigns {
-        id SERIAL
-        name TEXT
+        teamId INT
     }
 
     Challenges {
-        id SERIAL
-        name TEXT
-        points TEXT
-        campaign INT
-        team INT
+        challengeId SERIAL
+        challenge TEXT
         solution TEXT
+        points TEXT
+        teamId INT
     }
 
-    Admins {
-        id SERIAL
-        name TEXT
-        password TEXT
-    }
-
-    Team ||--o{ Players : "team_id"
-    Campaigns ||--o{ Challenges : "campaign_id"
-    Team ||--o{ Challenges : "team_id"
-    Team ||--o{ Admins : "team_id"
+    Team    ||--o{ Players    : "includes"
+    Players ||--o{ Challenges : "solves"
 ```
