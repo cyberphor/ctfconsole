@@ -15,6 +15,6 @@ CMD [ "postgres", \
   "-c", "logging_collector=on", \
   "-c", "log_destination=jsonlog", \
   "-c", "log_directory=/var/log/postgresql", \
-  "-c", "log_filename='postgresql-%a.log'", \
+  "-c", "log_filename=postgresql-%a.log", \
   "-c", "log_statement=all" \
 ]
